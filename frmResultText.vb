@@ -422,7 +422,7 @@ Public Class frmResultText
 	Private Function _GetSaveAsDialog(ByVal pFileFormat As String) As SaveFileDialog
 
 		'大文字、小文字の区切り文字を取得
-		Dim mFileFormatUpperCase As String = pFileFormat
+		Dim mFileFormatUpperCase As String = pFileFormat.ToUpper
 		Dim mFileFormatLowerCase As String = pFileFormat.ToLower
 
 		'名前を付けて保存ダイアログを表示
@@ -529,5 +529,79 @@ Public Class frmResultText
 	End Sub
 
 #End Region
+
+
+
+
+
+
+	Private Sub btnHtmlOutput_Click(sender As Object, e As EventArgs) Handles btnHtmlOutput.Click
+
+		Dim mHtmlSentence As New System.Text.StringBuilder
+
+		With mHtmlSentence
+
+			.AppendLine("<!DOCTYPE html>                         ")
+			.AppendLine("<html lang=""ja"">                      ")
+			.AppendLine("<head>                                  ")
+			.AppendLine("  <meta charset=""UTF-8"">              ")
+			.AppendLine("  <title>フォルダファイルリスト</title> ")
+			.AppendLine("</head>                                 ")
+			.AppendLine("<body>                                  ")
+            .AppendLine("  <header id=""header"">                ")
+            .AppendLine("  </header>                             ")
+            .AppendLine("  <div>                                 ")
+            .AppendLine("    <table>                             ")
+            .AppendLine("      <tbody>                           ")
+            .AppendLine("        <tr>                            ")
+
+            'ヘッダーを作成する
+            .AppendLine("          <th>" & FolderFileListColumn.Name.ToString & "</th>")
+            .AppendLine("          <th>" & FolderFileListColumn.SizeAndUnit.ToString & "</th>")
+
+            .AppendLine("        </tr>                           ")
+
+            'ToDo:別タブで開くような仕組みを作成すること
+
+            For Each mDr As DataRow In _FolderFileList.FolderFileList.Rows
+
+                'ToDo:別タブで開くような仕組みを作成すること
+
+                .AppendLine("        <tr>                              ")
+                .AppendLine("          <td>")
+
+                '別タブで開くリンクの作成方法
+                '.AppendLine("            <a href=""javascript:(function(){window.open(""" & "file:///" & mDr(FolderFileListColumn.FullPath) & """);})();"">" & mDr(FolderFileListColumn.Name) & "</a>")
+
+                .AppendLine("            <a href=""" & "file:///" & mDr(FolderFileListColumn.FullPath) & """>" & mDr(FolderFileListColumn.Name) & "</a>")
+
+                .AppendLine("          </td>")
+                .AppendLine("          <td>" & mDr(FolderFileListColumn.SizeAndUnit) & "</td>")
+                .AppendLine("        </tr>                             ")
+
+            Next
+
+            .AppendLine("      </tbody>                          ")
+            .AppendLine("    </table>                            ")
+            .AppendLine("  </div>                                ")
+            .AppendLine("  <footer id=""footer"">                ")
+			.AppendLine("    <p>copyright kobashi</p>            ")
+			.AppendLine("  </footer>                             ")
+			.AppendLine("</body>                                 ")
+			.AppendLine("</html>                                 ")
+
+		End With
+
+		'名前を付けて保存ダイアログを表示
+		Dim mDailog As SaveFileDialog = _GetSaveAsDialog("html")
+
+		If mDailog.ShowDialog = Windows.Forms.DialogResult.OK Then
+
+			'ファイルの保存処理
+			Call _WriteTextToOutputFile(mHtmlSentence.ToString, mDailog.FileName, cEncording.UTF8)
+
+		End If
+
+	End Sub
 
 End Class

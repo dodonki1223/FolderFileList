@@ -108,10 +108,11 @@ Public Class frmPopupMessage
 
 	End Sub
 
-	''' <summary>コンストラクタ</summary>
-	''' <param name="pMessage">表示させるメッセージ</param>
-	''' <remarks></remarks>
-	Public Sub New(ByVal pTitle As String, ByVal pMessage As String)
+    ''' <summary>コンストラクタ</summary>
+    ''' <param name="pMessage">表示させるメッセージ</param>
+    ''' <param name="pTitle">表示させるメッセージのタイトル</param>
+    ''' <remarks></remarks>
+    Public Sub New(ByVal pTitle As String, ByVal pMessage As String)
 
 		' この呼び出しはデザイナーで必要です。
 		InitializeComponent()

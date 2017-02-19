@@ -222,6 +222,9 @@ Public Class FolderFileList
 		''' <summary>iso-2022-jp</summary>
 		Public Shared ReadOnly JisCode As System.Text.Encoding = System.Text.Encoding.GetEncoding(50220)
 
+		''' <summary>UTF-8</summary>
+		Public Shared ReadOnly UTF8 As System.Text.Encoding = System.Text.Encoding.UTF8
+
 	End Class
 
 #End Region
@@ -379,9 +382,9 @@ Public Class FolderFileList
 
 			'フォルダファイルリストからフォルダのみを絞り込んで取得するクエリーを作成
 			Dim mQuery = From FolderFileList In _FolderFileList.AsEnumerable
-			Where FolderFileList(FolderFileListColumn.FileSystemType.ToString) = FileSystemType.Folder
-			Order By FolderFileList(FolderFileListColumn.No) Ascending
-			Select FolderFileList
+						 Where FolderFileList(FolderFileListColumn.FileSystemType.ToString) = FileSystemType.Folder
+						 Order By FolderFileList(FolderFileListColumn.No) Ascending
+						 Select FolderFileList
 
 			'クエリーからDataViewを作成
 			Dim mQueryToDataView As DataView = mQuery.AsDataView
@@ -400,9 +403,9 @@ Public Class FolderFileList
 
 			'フォルダファイルリストからファイルのみを絞り込んで取得するクエリーを作成
 			Dim mQuery = From FolderFileList In _FolderFileList.AsEnumerable
-			Where FolderFileList(FolderFileListColumn.FileSystemType.ToString) = FileSystemType.File
-			Order By FolderFileList(FolderFileListColumn.No) Ascending
-			Select FolderFileList
+						 Where FolderFileList(FolderFileListColumn.FileSystemType.ToString) = FileSystemType.File
+						 Order By FolderFileList(FolderFileListColumn.No) Ascending
+						 Select FolderFileList
 
 			'クエリーからDataViewを作成
 			Dim mQueryToDataView As DataView = mQuery.AsDataView
@@ -877,10 +880,10 @@ Public Class FolderFileList
 		'拡張子項目でグループ化（ファイル項目のみを抽出）し、空文字を除くクエリーを作成
 		'※拡張子はすべて小文字に変換する（大文字と小文字違いの拡張子をリストに表示させないため）
 		Dim mQuery = From Extensions In pFolderFileList
-					Where Extensions(FolderFileListColumn.FileSystemType.ToString) = FileSystemType.File
-					Group By Extension = Extensions(FolderFileListColumn.Extension).ToString.ToLower()
-					Into Group
-					Where Extension <> String.Empty
+					 Where Extensions(FolderFileListColumn.FileSystemType.ToString) = FileSystemType.File
+					 Group By Extension = Extensions(FolderFileListColumn.Extension).ToString.ToLower()
+					 Into Group
+					 Where Extension <> String.Empty
 
 
 		'初期値以外のリストを追加
