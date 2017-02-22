@@ -1,7 +1,10 @@
 ﻿Option Explicit On
 
 ''' <summary>コマンドラインの機能を提供する</summary>
-''' <remarks></remarks>
+''' <remarks>※処理タイプの判断基準
+'''            ①ヘルプキーワードが存在したらヘルプ処理
+'''            ②フォルダパスが取得できたらコマンド処理
+'''            ③フォルダパスを取得出来なかったら通常処理 </remarks>
 Public Class CommandLine
 
 #Region "定数"
@@ -263,7 +266,7 @@ Public Class CommandLine
 		End Property
 
 		''' <summary>引数付きコンストラクタ</summary>
-		''' <param name="pCommandLineArg">コマンドライン非キス</param>
+		''' <param name="pCommandLineArg">コマンドライン引数</param>
 		''' <param name="pKeyWord">キーワード</param>
 		''' <remarks></remarks>
 		Sub New(ByVal pCommandLineArg As String, ByVal pKeyWord As String)
@@ -402,23 +405,23 @@ Public Class CommandLine
 		'コマンドライン引数分繰り返す
 		For Each mCommand As String In My.Application.CommandLineArgs
 
-			'ヘルプコマンドが存在するかをセット、ヘルプコマンドがあった場合はヘルプコマンド以外がセットされていた場合は無視して処理を終了
+			'ヘルプコマンドが存在するかをセット、ヘルプコマンドがあった場合はヘルプコマンド以外がセットされていても無視して処理を終了
 			If _SetHelpCommand(mCommand, _Commands) Then Exit Sub
 
 			'フォルダパスをセット、セット出来た時は次の繰り返しへ
 			If _SetFolderPath(mCommand, _Commands) Then Continue For
 
-			'フォームタイプコマンドをセット、セット出来なかった時は次の繰り返しへ
-			If Not _SetFormTypeCommand(mCommand, _Commands) Then Continue For
+			'フォームタイプコマンドをセット、セット出来た時は次の繰り返しへ
+			If _SetFormTypeCommand(mCommand, _Commands) Then Continue For
 
-			'出力形式コマンドをセット、セット出来なかった時は次の繰り返しへ
-			If Not _SetOutPutCommand(mCommand, _Commands) Then Continue For
+			'出力形式コマンドをセット、セット出来た時は次の繰り返しへ
+			If _SetOutPutCommand(mCommand, _Commands) Then Continue For
 
-			'拡張子コマンドをセット、セット出来なかった時は次の繰り返しへ
-			If Not _SetExtensionCommand(mCommand, _Commands) Then Continue For
+			'拡張子コマンドをセット、セット出来た時は次の繰り返しへ
+			If _SetExtensionCommand(mCommand, _Commands) Then Continue For
 
-			'最大表示ファイル数コマンドをセット、セット出来なかった時は次の繰り返しへ
-			If Not _SetPageSizeCommand(mCommand, _Commands) Then Continue For
+			'最大表示ファイル数コマンドをセット、セット出来た時は次の繰り返しへ
+			If _SetPageSizeCommand(mCommand, _Commands) Then Continue For
 
 		Next
 
@@ -505,9 +508,13 @@ Public Class CommandLine
 
 			End Select
 
-		End If
+			Return True
 
-		Return True
+		Else
+
+			Return False
+
+		End If
 
 	End Function
 
@@ -542,9 +549,13 @@ Public Class CommandLine
 
 			End Select
 
-		End If
+			Return True
 
-		Return True
+		Else
+
+			Return False
+
+		End If
 
 	End Function
 
@@ -579,9 +590,13 @@ Public Class CommandLine
 
 			End Select
 
-		End If
+			Return True
 
-		Return True
+		Else
+
+			Return False
+
+		End If
 
 	End Function
 
@@ -595,7 +610,7 @@ Public Class CommandLine
 	Private Function _SetPageSizeCommand(ByVal pCommandLineArg As String, ByRef pCommands As CommandList) As Boolean
 
 		'コマンドライン引数から拡張子コマンドと拡張子を取得
-		Dim mCommand As New Command(pCommandLineArg, cKeyWords.OutPut)
+		Dim mCommand As New Command(pCommandLineArg, cKeyWords.PageSize)
 
 		'対象コマンドがフォームタイプコマンドの時
 		If mCommand.KeyWord.ToLower = cKeyWords.PageSize.ToLower Then
@@ -607,14 +622,19 @@ Public Class CommandLine
 
 				'文字列を数値に変換したものをセット
 				pCommands.PageSize = mSetPageSize
-
 				Return True
+
+			Else
+
+				Return False
 
 			End If
 
-		End If
+		Else
 
-		Return False
+			Return False
+
+		End If
 
 	End Function
 

@@ -541,54 +541,94 @@ Public Class frmResultText
 
 		With mHtmlSentence
 
-			.AppendLine("<!DOCTYPE html>                         ")
-			.AppendLine("<html lang=""ja"">                      ")
-			.AppendLine("<head>                                  ")
-			.AppendLine("  <meta charset=""UTF-8"">              ")
-			.AppendLine("  <title>フォルダファイルリスト</title> ")
-			.AppendLine("</head>                                 ")
-			.AppendLine("<body>                                  ")
-            .AppendLine("  <header id=""header"">                ")
-            .AppendLine("  </header>                             ")
-            .AppendLine("  <div>                                 ")
-            .AppendLine("    <table>                             ")
-            .AppendLine("      <tbody>                           ")
-            .AppendLine("        <tr>                            ")
+			.AppendLine("<!DOCTYPE html>                                                                                                ")
+			.AppendLine("<html lang=""ja"">                                                                                             ")
+			.AppendLine("<head>                                                                                                         ")
+			.AppendLine("  <meta charset=""UTF-8"">                                                                                     ")
+			.AppendLine("  <title>フォルダファイルリスト</title>                                                                        ")
+			.AppendLine("</head>                                                                                                        ")
+			.AppendLine("<body>                                                                                                         ")
+			.AppendLine("  <header id=""header"">                                                                                       ")
+			.AppendLine("  </header>                                                                                                    ")
+
+			.AppendLine("  <fieldset>                                                                                                   ")
+			.AppendLine("  <legend>絞り込み条件</legend>                                                                                ")
+
+			'対象ファイル指定を作成
+			.AppendLine("    <div>                                                                                                      ")
+			.AppendLine("      <input type=""radio"" name=""displayTarget"" value=""全て表示"">全て表示</input>                         ")
+			.AppendLine("      <input type=""radio"" name=""displayTarget"" value=""フォルダのみ表示"">フォルダのみ表示</input>         ")
+			.AppendLine("      <input type=""radio"" name=""displayTarget"" value=""ファイルのみ表示"">ファイルのみ表示</input>         ")
+			.AppendLine("    </div>                                                                                                     ")
+			'拡張子選択領域を作成
+			.AppendLine("    <div>                                                                                                      ")
+			.AppendLine("      <div>                                                                                                    ")
+			.AppendLine("        <span>拡張子</span>                                                                                    ")
+			.AppendLine("      </div>                                                                                                   ")
+			.AppendLine("      <select name=""extension"">                                                                              ")
+
+			For Each mExtension As String In _FolderFileList.ExtensionList
+
+				.AppendLine("            <option value=""" & mExtension & """>" & mExtension & "</option>                                   ")
+
+			Next
+
+			.AppendLine("      </select>                                                                                                ")
+			.AppendLine("    </div>                                                                                                     ")
+
+			'テキスト入力ボックス
+			.AppendLine("    <div>                                                                                                      ")
+			.AppendLine("      <div>                                                                                                    ")
+			.AppendLine("        <span>名前(LIKE検索)</span>                                                                            ")
+			.AppendLine("      </div>                                                                                                   ")
+			.AppendLine("      <input type=""text"" name=""fileNameSearch""></input>                           ")
+			.AppendLine("    </div>                                                                                                       ")
+
+			.AppendLine("  </fieldset>                                                                                                  ")
+
+			.AppendLine("  <div>                                                                                                        ")
+			.AppendLine("    <table>                                                                                                    ")
+			.AppendLine("      <tbody>                                                                                                  ")
+			.AppendLine("        <tr>                                                                                                   ")
 
             'ヘッダーを作成する
-            .AppendLine("          <th>" & FolderFileListColumn.Name.ToString & "</th>")
-            .AppendLine("          <th>" & FolderFileListColumn.SizeAndUnit.ToString & "</th>")
+			.AppendLine("          <th>" & FolderFileListColumn.Name.ToString & "</th>                                                  ")
+			.AppendLine("          <th>" & FolderFileListColumn.UpdateDate.ToString & "</th>                                            ")
+			.AppendLine("          <th>" & FolderFileListColumn.FileSystemType.ToString & "</th>                                        ")
+			.AppendLine("          <th>" & FolderFileListColumn.SizeAndUnit.ToString & "</th>                                           ")
+			.AppendLine("          <th>" & FolderFileListColumn.Extension.ToString & "</th>                                             ")
+			.AppendLine("          <th>" & FolderFileListColumn.ParentFolder.ToString & "</th>                                          ")
 
-            .AppendLine("        </tr>                           ")
+			.AppendLine("        </tr>                                                                                                  ")
 
-            'ToDo:別タブで開くような仕組みを作成すること
+			'明細を作成する
+			For Each mDr As DataRow In _FolderFileList.FolderFileList.Rows
 
-            For Each mDr As DataRow In _FolderFileList.FolderFileList.Rows
+				'ファイルパスのURLを作成
+				Dim mFilePathUrl As String = _CreateWindowOpenURL(mDr(FolderFileListColumn.FullPath))
 
-                'ToDo:別タブで開くような仕組みを作成すること
+				'親フォルダパスのURLを作成
+				Dim mParentFolderPathUrl As String = _CreateWindowOpenURL(mDr(FolderFileListColumn.ParentFolderFullPath))
 
-                .AppendLine("        <tr>                              ")
-                .AppendLine("          <td>")
+				.AppendLine("        <tr>                                                                                                   ")
+				.AppendLine("          <td><a href=""" & mFilePathUrl & """>" & mDr(FolderFileListColumn.Name) & "</a></td>                 ")
+				.AppendLine("          <td>" & mDr(FolderFileListColumn.UpdateDate) & "</td>                                                ")
+				.AppendLine("          <td>" & mDr(FolderFileListColumn.SizeAndUnit) & "</td>                                               ")
+				.AppendLine("          <td>" & mDr(FolderFileListColumn.FileSystemTypeName) & "</td>                                        ")
+				.AppendLine("          <td>" & mDr(FolderFileListColumn.Extension) & "</td>                                                 ")
+				.AppendLine("          <td><a href=""" & mParentFolderPathUrl & """>" & mDr(FolderFileListColumn.ParentFolder) & "</a></td> ")
+				.AppendLine("        </tr>                                                                                                  ")
 
-                '別タブで開くリンクの作成方法
-                '.AppendLine("            <a href=""javascript:(function(){window.open(""" & "file:///" & mDr(FolderFileListColumn.FullPath) & """);})();"">" & mDr(FolderFileListColumn.Name) & "</a>")
+			Next
 
-                .AppendLine("            <a href=""" & "file:///" & mDr(FolderFileListColumn.FullPath) & """>" & mDr(FolderFileListColumn.Name) & "</a>")
-
-                .AppendLine("          </td>")
-                .AppendLine("          <td>" & mDr(FolderFileListColumn.SizeAndUnit) & "</td>")
-                .AppendLine("        </tr>                             ")
-
-            Next
-
-            .AppendLine("      </tbody>                          ")
-            .AppendLine("    </table>                            ")
-            .AppendLine("  </div>                                ")
-            .AppendLine("  <footer id=""footer"">                ")
-			.AppendLine("    <p>copyright kobashi</p>            ")
-			.AppendLine("  </footer>                             ")
-			.AppendLine("</body>                                 ")
-			.AppendLine("</html>                                 ")
+			.AppendLine("      </tbody>                                                                                                 ")
+			.AppendLine("    </table>                                                                                                   ")
+			.AppendLine("  </div>                                                                                                       ")
+			.AppendLine("  <footer id=""footer"">                                                                                       ")
+			.AppendLine("    <p>copyright kobashi</p>                                                                                   ")
+			.AppendLine("  </footer>                                                                                                    ")
+			.AppendLine("</body>                                                                                                        ")
+			.AppendLine("</html>                                                                                                        ")
 
 		End With
 
@@ -603,5 +643,20 @@ Public Class frmResultText
 		End If
 
 	End Sub
+
+	''' <summary>window.openで開く用のURLを作成</summary>
+	''' <param name="pPath">対象パス</param>
+	''' <returns>window.openで開く用のURL文字列</returns>
+	''' <remarks>※別タブでリンクを開く時のパスは以下のどちらかの
+	'''            形式でなければならない
+	'''              ①\\\\FileServer\\Folder1\\Gorira.txt
+	'''              ②file://FileServer/Folder1/Gorira.txt      </remarks>
+	Private Function _CreateWindowOpenURL(ByVal pPath As string) As String
+
+		'パス文字列から「\」マークを「\\」に変換し、
+		'パス文字列の前と後にjavascriptのwindow.open用の文字列を付加して返す
+		Return "javascript:window.open('" & "file:\\\\" & Replace(pPath, "\", "\\") & "');"
+
+	End Function
 
 End Class

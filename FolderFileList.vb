@@ -451,7 +451,7 @@ Public Class FolderFileList
 
 		Get
 
-			Return GetExtensionList(_FolderFileList)
+			Return _GetExtensionList(_FolderFileList)
 
 		End Get
 
@@ -871,7 +871,7 @@ Public Class FolderFileList
 	''' <param name="pFolderFileList"></param>
 	''' <returns>拡張子リスト</returns>
 	''' <remarks>引数で渡されたリストの拡張子リストを返します</remarks>
-	Public Function GetExtensionList(ByVal pFolderFileList As DataTable) As ArrayList
+	Private Function _GetExtensionList(ByVal pFolderFileList As DataTable) As ArrayList
 
 		'初期値のリスト（空文字）を追加
 		Dim mExtensioinListArray As New ArrayList
