@@ -23,6 +23,10 @@ Public Class DebugMode
 	<Conditional("DEBUG")> _
 	Public Shared Sub StartDebugWatch()
 
+		'時間の計測をリセット
+		'※２回目以降が前の最終計測時間後から使われてしまうため
+		DebugWatch.Instance.ResetTime()
+
 		'時間の計測開始
 		DebugWatch.Instance.StartTime()
 

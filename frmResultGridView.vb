@@ -81,44 +81,40 @@ Public Class frmResultGridView
         ''' <summary>ヘッダー名を取得</summary>
         ''' <returns>ヘッダー名</returns>
         ''' <remarks>ヘッダー名をArrayListで返す</remarks>
-        Public Shared Function HeaderNames() As ArrayList
+		Public Shared Function HeaderNames() As ArrayList
 
-            Dim mHeaderNames As New ArrayList
+			Dim mHeaderNames As New ArrayList
 
-            'ヘッダー用の名前をArrayListに追加していく
-            For Each mColumnName As String In System.Enum.GetNames(GetType(HeaderName))
+			'ヘッダー用の名前をArrayListに追加していく
+			For Each mColumnName As String In System.Enum.GetNames(GetType(HeaderName))
 
-                mHeaderNames.Add(mColumnName)
+				mHeaderNames.Add(mColumnName)
 
-            Next
+			Next
 
-            Return mHeaderNames
+			Return mHeaderNames
 
-        End Function
+		End Function
 
-        ''' <summary>区切り文字用ヘッダー名を取得</summary>
-        ''' <returns>区切り文字用ヘッダー名</returns>
-        ''' <remarks>ヘッダー名をArrayListで返す</remarks>
-        Public Shared Function DelimiterHeaderNames() As ArrayList
+		''' <summary>区切り文字用ヘッダー名を取得</summary>
+		''' <returns>区切り文字用ヘッダー名</returns>
+		''' <remarks>ヘッダー名をArrayListで返す</remarks>
+		Public Shared Function DelimiterHeaderNames() As ArrayList
 
-            Dim mHeaderNames As New ArrayList
+			Dim mHeaderNames As New ArrayList
 
-            'ヘッダー用の名前をArrayListに追加していく
-            For Each mColumnName As String In System.Enum.GetNames(GetType(DelimiterHeaderName))
+			'ヘッダー用の名前をArrayListに追加していく
+			For Each mColumnName As String In System.Enum.GetNames(GetType(DelimiterHeaderName))
 
-                mHeaderNames.Add(mColumnName)
+				mHeaderNames.Add(mColumnName)
 
-            Next
+			Next
 
-            Return mHeaderNames
+			Return mHeaderNames
 
-        End Function
+		End Function
 
 	End Class
-
-	''' <summary>１ページ内に表示できるファイル数</summary>
-	''' <remarks>フォルダファイルリストGridViewの1ページに表示される最大件数（デフォルト値）</remarks>
-	Public Const cGridViewDataMaxCountInPage As Integer = 1000
 
 	''' <summary>リスト表示フォームで使用するメッセージを提供する</summary>
 	''' <remarks></remarks>
@@ -142,6 +138,60 @@ Public Class frmResultGridView
 		Public Shared NoticeMessageAfterDetail As String = "形式を" & Environment.NewLine & "クリップボードにコピーしました"
 
 	End Class
+
+	''' <summary>ヘッダーセルカラー</summary>
+	''' <remarks></remarks>
+	Private Class _cHeaderCellColor
+
+		''' <summary>昇順カラー</summary>
+		''' <remarks>HotPink</remarks>
+		Public Shared ReadOnly Asceding As System.Drawing.Color = Color.HotPink
+
+		''' <summary>降順カラー</summary>
+		''' <remarks>LightSkyBlue</remarks>
+		Public Shared ReadOnly Desceding As System.Drawing.Color = Color.LightSkyBlue
+
+	End Class
+
+	''' <summary>１ページ内に表示できるファイル数</summary>
+	''' <remarks>フォルダファイルリストGridViewの1ページに表示される最大件数（デフォルト値）</remarks>
+	Public Const cGridViewDataMaxCountInPage As Integer = 1000
+
+#End Region
+
+#Region "変数"
+
+	''' <summary>フォルダファイルリストデータ</summary>
+	''' <remarks></remarks>
+	Private _FolderFileList As FolderFileList
+
+	''' <summary>リサイズ前ウインドウサイズ</summary>
+	''' <remarks></remarks>
+	Private _WindowSize As System.Drawing.Size
+
+	''' <summary>リサイズ後の変更分ウインドウサイズ</summary>
+	''' <remarks></remarks>
+	Private _ChangedWindowSize As System.Drawing.Size
+
+	''' <summary>GridViewに現在表示されている情報</summary>
+	''' <remarks></remarks>
+	Private _CurrentGridView As _GridViewState
+
+	''' <summary>GridViewのSizeAndUnitヘッダーの状態</summary>
+	''' <remarks>デフォルトは「なし」</remarks>
+	Private _SortOrderFromByteSizeAndUnit As SortOrder = SortOrder.None
+
+	''' <summary>現在表示しているページ番号</summary>
+	''' <remarks>GridViewのページング処理で使用する</remarks>
+	Private _CurrentPage As Integer = 1
+
+	''' <summary>１ページ内に表示できるファイル数</summary>
+	''' <remarks>フォルダファイルリストGridViewの1ページに表示される最大件数</remarks>
+	Private _GridViewDataMaxCountInPage As Integer = cGridViewDataMaxCountInPage
+
+	''' <summary>フォームのインスタンスを保持する変数</summary>
+	''' <remarks></remarks>
+	Private Shared _instance As frmResultGridView
 
 #End Region
 
@@ -324,42 +374,6 @@ Public Class frmResultGridView
 
 #End Region
 
-#Region "変数"
-
-    ''' <summary>フォルダファイルリストデータ</summary>
-    ''' <remarks></remarks>
-    Private _FolderFileList As FolderFileList
-
-	''' <summary>リサイズ前ウインドウサイズ</summary>
-	''' <remarks></remarks>
-	Private _WindowSize As System.Drawing.Size
-
-    ''' <summary>リサイズ後の変更分ウインドウサイズ</summary>
-    ''' <remarks></remarks>
-    Private _ChangedWindowSize As System.Drawing.Size
-
-	''' <summary>GridViewに現在表示されている情報</summary>
-	''' <remarks></remarks>
-	Private _CurrentGridView As _GridViewState
-
-	''' <summary>GridViewのSizeAndUnitヘッダーの状態</summary>
-	''' <remarks>デフォルトは「なし」</remarks>
-	Private _SortOrderFromByteSizeAndUnit As SortOrder = SortOrder.None
-
-    ''' <summary>現在表示しているページ番号</summary>
-    ''' <remarks>GridViewのページング処理で使用する</remarks>
-	Private _CurrentPage As Integer = 1
-
-	''' <summary>１ページ内に表示できるファイル数</summary>
-	''' <remarks>フォルダファイルリストGridViewの1ページに表示される最大件数</remarks>
-	Private _GridViewDataMaxCountInPage As Integer = cGridViewDataMaxCountInPage
-
-	''' <summary>フォームのインスタンスを保持する変数</summary>
-	''' <remarks></remarks>
-	Private Shared _instance As frmResultGridView
-
-#End Region
-
 #Region "プロパティ"
 
 	''' <summary>フォームにアクセスするためのプロパティ</summary>
@@ -426,9 +440,9 @@ Public Class frmResultGridView
 
 #Region "コンストラクタ"
 
-    ''' <summary>コンストラクタ</summary>
-    ''' <remarks>引数無しは外部に公開しない</remarks>>
-    Private Sub New()
+	''' <summary>コンストラクタ</summary>
+	''' <remarks>引数無しは外部に公開しない</remarks>>
+	Private Sub New()
 
 		' この呼び出しはデザイナーで必要です。
 		InitializeComponent()
@@ -690,11 +704,11 @@ Public Class frmResultGridView
 
 #Region "ボタン"
 
-    ''' <summary>次へボタンクリックイベント</summary>
-    ''' <param name="sender">次へボタン</param>
-    ''' <param name="e">Clickイベント</param>
-    ''' <remarks></remarks>
-    Private Sub btnNextPage_Click(sender As Object, e As EventArgs) Handles btnNextPage.Click
+	''' <summary>次へボタンクリックイベント</summary>
+	''' <param name="sender">次へボタン</param>
+	''' <param name="e">Clickイベント</param>
+	''' <remarks></remarks>
+	Private Sub btnNextPage_Click(sender As Object, e As EventArgs) Handles btnNextPage.Click
 
 		'現在ページをカウントアップしてフォルダファイルリストページング処理
 		_SetPaging(_CurrentPage + 1)
@@ -705,13 +719,13 @@ Public Class frmResultGridView
 		'画面コントロール設定
 		_SetControlInScreen()
 
-    End Sub
+	End Sub
 
-    ''' <summary>前へボタンクリックイベント</summary>
-    ''' <param name="sender">前へボタン</param>
-    ''' <param name="e">Clickイベント</param>
-    ''' <remarks></remarks>
-    Private Sub btnPrevPage_Click(sender As Object, e As EventArgs) Handles btnPrevPage.Click
+	''' <summary>前へボタンクリックイベント</summary>
+	''' <param name="sender">前へボタン</param>
+	''' <param name="e">Clickイベント</param>
+	''' <remarks></remarks>
+	Private Sub btnPrevPage_Click(sender As Object, e As EventArgs) Handles btnPrevPage.Click
 
 		'現在ページをカウントダウンしてフォルダファイルリストページング処理
 		_SetPaging(_CurrentPage - 1)
@@ -724,10 +738,10 @@ Public Class frmResultGridView
 
 	End Sub
 
-    ''' <summary>CSV出力ボタンクリックイベント</summary>
-    ''' <param name="sender">CSV出力ボタン</param>
-    ''' <param name="e">Clickイベント</param>
-    ''' <remarks></remarks>
+	''' <summary>CSV出力ボタンクリックイベント</summary>
+	''' <param name="sender">CSV出力ボタン</param>
+	''' <param name="e">Clickイベント</param>
+	''' <remarks></remarks>
 	Private Async Sub btnCSV_Click(sender As Object, e As EventArgs) Handles btnCSV.Click
 
 		'メッセージボックスから押されたボタンにより処理を分岐
@@ -1304,62 +1318,52 @@ Public Class frmResultGridView
 
 			Case SortOrder.Ascending
 
-				pHeaderCell.Style.BackColor = Color.Red
+				pHeaderCell.Style.BackColor = _cHeaderCellColor.Asceding
 
 			Case SortOrder.Descending
 
-				pHeaderCell.Style.BackColor = Color.Blue
+				pHeaderCell.Style.BackColor = _cHeaderCellColor.Desceding
 
 		End Select
 
 	End Sub
 
-	''' <summary>ファイルサイズレベルで行に色を付ける</summary>
-	''' <remarks>レベルごと色を付けるチェックボックスが
-	'''            チェックされている時は色をつける
-	'''            チェックされていない時は色をなくす  </remarks>
-	Private Sub _ToColorRowByFileSizeLevel()
+    ''' <summary>ファイルサイズレベルで行に色を付ける</summary>
+    ''' <remarks>レベルごと色を付けるチェックボックスが
+    '''            チェックされている時は色をつける
+    '''            チェックされていない時は色をなくす  </remarks>
+    Private Sub _ToColorRowByFileSizeLevel()
 
-		For Each mRow As DataGridViewRow In dgvFolderFileList.Rows
+        For Each mRow As DataGridViewRow In dgvFolderFileList.Rows
 
-			Dim mFileSizeLevel As FolderFileList.cFileSizeLevel.SizeLevel
+            Dim mFileSizeLevel As FolderFileList.cFileSizeLevel.SizeLevel
 
-			'ファイルサイズレベルを取得
-			If chkFileSizeLevel.Checked = True Then
+            'ファイルサイズレベルを取得
+            If chkFileSizeLevel.Checked = True Then
 
-				mFileSizeLevel = Integer.Parse(mRow.Cells(FolderFileListColumn.SizeLevel).Value)
+                mFileSizeLevel = Integer.Parse(mRow.Cells(FolderFileListColumn.SizeLevel).Value)
 
-			Else
+            Else
 
-				mFileSizeLevel = Nothing
+                mFileSizeLevel = Nothing
 
-			End If
+            End If
 
-			'背景色をファイルサイズレベルに応じた色にする
-			mRow.DefaultCellStyle.BackColor = FolderFileList.cFileSizeLevel.LevelColor(mFileSizeLevel)
+            '背景色をファイルサイズレベルに応じた色にする
+            mRow.DefaultCellStyle.BackColor = FolderFileList.cFileSizeLevel.LevelColor(mFileSizeLevel)
 
-		Next
+        Next
 
-	End Sub
-
-	''' <summary>Alt+Tabのウインドウ切り替え時非表示</summary>
-	''' <remarks></remarks>
-	Private Sub _SetNotShowWindowToAltTab()
-
-		'Alt+Tabに表示させない
-		Me.FormBorderStyle = Windows.Forms.FormBorderStyle.FixedToolWindow
-		Me.ShowInTaskbar = False
-
-	End Sub
+    End Sub
 
 #End Region
 
 #Region "ページングメソッド"
 
-	''' <summary>ページング処理</summary>
-	''' <param name="pPageNo">ページ番号</param>
-	''' <remarks>対象ページ番号のページング設定を行う</remarks>
-	Private Sub _SetPaging(ByVal pPageNo As Integer)
+    ''' <summary>ページング処理</summary>
+    ''' <param name="pPageNo">ページ番号</param>
+    ''' <remarks>対象ページ番号のページング設定を行う</remarks>
+    Private Sub _SetPaging(ByVal pPageNo As Integer)
 
 		'現在ページにセット
 		_CurrentPage = pPageNo
@@ -1553,21 +1557,23 @@ Public Class frmResultGridView
 
 	End Sub
 
-    ''' <summary>グリッドビューセルからフルパスを取得</summary>
-    ''' <param name="pDgv">フォルダファイルリストGridView</param>
-    ''' <param name="pCell">対象セル</param>
-    ''' <returns></returns>
-    Private Function _GetFullPathFromGridViewCell(ByVal pDgv As DataGridView, ByVal pCell As DataGridViewCell) As String
+	''' <summary>グリッドビューセルからフルパスを取得</summary>
+	''' <param name="pDgv">フォルダファイルリストGridView</param>
+	''' <param name="pCell">対象セル</param>
+	''' <returns></returns>
+	Private Function _GetFullPathFromGridViewCell(ByVal pDgv As DataGridView, ByVal pCell As DataGridViewCell) As String
 
 		Select Case pCell.ColumnIndex
 
-			Case FolderFileListColumn.Name
+            Case FolderFileListColumn.Name, FolderFileListColumn.UnderTargetFolder, FolderFileListColumn.FullPath
 
-				Return pDgv.Rows(pCell.RowIndex).Cells(FolderFileListColumn.FullPath).Value.ToString
+                'ファイル名、対象フォルダ以下、ファイルのフルパスの時はフルパスを返す
+                Return pDgv.Rows(pCell.RowIndex).Cells(FolderFileListColumn.FullPath).Value.ToString
 
 			Case FolderFileListColumn.ParentFolder
 
-				Return pDgv.Rows(pCell.RowIndex).Cells(FolderFileListColumn.ParentFolderFullPath).Value.ToString
+                '親フォルダの時は親フォルダのフルパスを返す
+                Return pDgv.Rows(pCell.RowIndex).Cells(FolderFileListColumn.ParentFolderFullPath).Value.ToString
 
 			Case Else
 
@@ -1696,7 +1702,7 @@ Public Class frmResultGridView
 	Private Function _GetSaveAsDialog(ByVal pDelimiter As OutputDelimiterText.Delimiter) As SaveFileDialog
 
 		'大文字、小文字の区切り文字を取得
-		Dim mDelimiterUpperCase As String = pDelimiter.ToString
+		Dim mDelimiterUpperCase As String = pDelimiter.ToString.ToUpper
 		Dim mDelimiterLowerCase As String = pDelimiter.ToString.ToLower
 
 		'名前を付けて保存ダイアログを表示
@@ -1735,9 +1741,9 @@ Public Class frmResultGridView
 
 #Region "コマンド処理メソッド"
 
-    ''' <summary>コマンド処理を実行</summary>
-    ''' <remarks>コマンドタイプによりそれぞれの処理を行う</remarks>
-    Private Async Sub _RunCommandProcess()
+	''' <summary>コマンド処理を実行</summary>
+	''' <remarks>コマンドタイプによりそれぞれの処理を行う</remarks>
+	Private Async Sub _RunCommandProcess()
 
         '出力形式コマンドが指定なしの時
         If CommandLine.Instance.OutPut = CommandLine.OutPutType.None Then
@@ -1747,18 +1753,18 @@ Public Class frmResultGridView
 
         Else
 
+            'Alt+Tabに表示させない
+            Call MyBase.SetShowHideAltTabWindow(AltTabType.Hide)
+
             Select Case CommandLine.Instance.OutPut
 
-				Case CommandLine.OutPutType.ClipBoard
+                Case CommandLine.OutPutType.ClipBoard
 
-					'Alt+Tabに表示させない
-					Call _SetNotShowWindowToAltTab()
-
-					'出力用テキストクリップボードコピー
-					Call _SaveOutPutTextFileToClipBoard(CommandLine.Instance.Extension)
+                    '出力用テキストクリップボードコピー
+                    Call _SaveOutPutTextFileToClipBoard(CommandLine.Instance.Extension)
 
 					'クリップボードにコピーしました通知を表示
-					Dim mFrmPopupMessage As New frmPopupMessage(_cMessage.NoticeMessageTitle,_cMessage.NoticeMessageDetail)
+					Dim mFrmPopupMessage As New frmPopupMessage(_cMessage.NoticeMessageTitle, _cMessage.NoticeMessageDetail)
 					mFrmPopupMessage.Show()
 
 					'非同期でMessenger風通知メッセージが非表示になるまで待機
@@ -1771,30 +1777,27 @@ Public Class frmResultGridView
 
                 Case CommandLine.OutPutType.SaveDialog
 
-					'Alt+Tabに表示させない
-					Call _SetNotShowWindowToAltTab()
-
                     '出力用テキスト保存処理
                     Call _SaveOutPutTextFile(CommandLine.Instance.Extension)
 
 					'メインフォームのリソースを破棄する
-                    '※Closeをすると無限ループしてしまうのでDisposeで対応（これでいいのか不明……）
-                    '  メインフォームを表示させず閉じるため
-                    Me.Owner.Dispose()
+					'※Closeをすると無限ループしてしまうのでDisposeで対応（これでいいのか不明……）
+					'  メインフォームを表示させず閉じるため
+					Me.Owner.Dispose()
 
-            End Select
+			End Select
 
-        End If
+		End If
 
-    End Sub
+	End Sub
 
 #End Region
 
 #Region "外部公開メソッド"
 
-    ''' <summary>インスタンスを保持する変数の破棄処理</summary>
-    ''' <remarks></remarks>
-    Public Shared Sub DisposeInstance()
+	''' <summary>インスタンスを保持する変数の破棄処理</summary>
+	''' <remarks></remarks>
+	Public Shared Sub DisposeInstance()
 
 		_instance = Nothing
 

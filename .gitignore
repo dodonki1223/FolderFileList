@@ -1,3 +1,5 @@
 #以下のフォルダを含まない
-\bin
-\obj
+/bin/
+/obj/
+/.vs/
+/FolderFileList.v11.suo
