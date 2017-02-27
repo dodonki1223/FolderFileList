@@ -619,8 +619,8 @@ Public Class FolderFileList
 
 #Region "対象フォルダ内のファイル数を取得"
 
-    ''' <summary>対象フォルダ内のサブディレクトリとファイル数を取得</summary>
-    ''' <returns>対象フォルダ内のサブディレクトリとファイル数</returns>
+	''' <summary>対象フォルダ内のサブディレクトリとファイル数を取得</summary>
+	''' <returns>対象フォルダ内のサブディレクトリとファイル数</returns>
 	''' <remarks>
 	'''  メモ：DirectoryクラスとDirectoryInfoクラスの違い
 	'''    Directoryクラスはstaticなメソッドばかりからなるユーティリティ的なクラ
@@ -636,8 +636,11 @@ Public Class FolderFileList
 
 		'対象フォルダ内のサブディレクトリとファイル数を取得
 		Dim mDI As New DirectoryInfo(_TargetPath)
-		Dim mFolderFileCount As Integer = mDI.GetFileSystemInfos("*", SearchOption.AllDirectories).Length
+		Dim mFolderFileCount As Integer = mDI.GetFileSystemInfos("*", SearchOption.AllDirectories).Length + 1
 		mDI = Nothing
+
+		'対象フォルダパスが含まれていないので＋１する
+		mFolderFileCount = mFolderFileCount + 1
 
 		Return mFolderFileCount
 
