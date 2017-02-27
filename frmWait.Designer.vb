@@ -38,16 +38,16 @@ Partial Class frmWait
 		Me.lblMaking.Font = New System.Drawing.Font("MS UI Gothic", 12.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
 		Me.lblMaking.Location = New System.Drawing.Point(6, 9)
 		Me.lblMaking.Name = "lblMaking"
-		Me.lblMaking.Size = New System.Drawing.Size(266, 16)
+		Me.lblMaking.Size = New System.Drawing.Size(366, 16)
 		Me.lblMaking.TabIndex = 0
-		Me.lblMaking.Text = "フォルダファイルリスト作成中．．．．．．"
+		Me.lblMaking.Text = "対象フォルダ内のフォルダ・ファイル数を計算しています"
 		'
 		'ssProgress
 		'
 		Me.ssProgress.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tspbProgressRate, Me.tsslStatus})
 		Me.ssProgress.Location = New System.Drawing.Point(0, 59)
 		Me.ssProgress.Name = "ssProgress"
-		Me.ssProgress.Size = New System.Drawing.Size(284, 22)
+		Me.ssProgress.Size = New System.Drawing.Size(374, 22)
 		Me.ssProgress.TabIndex = 1
 		Me.ssProgress.Text = "StatusStrip1"
 		'
@@ -59,7 +59,7 @@ Partial Class frmWait
 		'tsslStatus
 		'
 		Me.tsslStatus.Name = "tsslStatus"
-		Me.tsslStatus.Size = New System.Drawing.Size(136, 17)
+		Me.tsslStatus.Size = New System.Drawing.Size(257, 17)
 		Me.tsslStatus.Spring = True
 		Me.tsslStatus.Text = "0％完了"
 		Me.tsslStatus.TextAlign = System.Drawing.ContentAlignment.MiddleRight
@@ -69,25 +69,25 @@ Partial Class frmWait
 		Me.ssDisplayFoloderFile.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsslProcessingFolderFile})
 		Me.ssDisplayFoloderFile.Location = New System.Drawing.Point(0, 37)
 		Me.ssDisplayFoloderFile.Name = "ssDisplayFoloderFile"
-		Me.ssDisplayFoloderFile.Size = New System.Drawing.Size(284, 22)
+		Me.ssDisplayFoloderFile.Size = New System.Drawing.Size(374, 22)
 		Me.ssDisplayFoloderFile.TabIndex = 3
 		Me.ssDisplayFoloderFile.Text = "StatusStrip1"
 		'
 		'tsslProcessingFolderFile
 		'
 		Me.tsslProcessingFolderFile.Name = "tsslProcessingFolderFile"
-		Me.tsslProcessingFolderFile.Size = New System.Drawing.Size(269, 17)
-		Me.tsslProcessingFolderFile.Text = "処理中フォルダ・ファイルを表示が表示されます"
+		Me.tsslProcessingFolderFile.Size = New System.Drawing.Size(233, 17)
+		Me.tsslProcessingFolderFile.Text = "処理中のフォルダファイルが表示されます"
 		'
 		'frmWait
 		'
 		Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
 		Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-		Me.ClientSize = New System.Drawing.Size(284, 81)
+		Me.ClientSize = New System.Drawing.Size(374, 81)
 		Me.Controls.Add(Me.ssDisplayFoloderFile)
 		Me.Controls.Add(Me.ssProgress)
 		Me.Controls.Add(Me.lblMaking)
-		Me.MinimumSize = New System.Drawing.Size(290, 100)
+		Me.MinimumSize = New System.Drawing.Size(390, 100)
 		Me.Name = "frmWait"
 		Me.Opacity = 0.0R
 		Me.Text = "リスト作成中"

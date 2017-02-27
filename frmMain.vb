@@ -596,70 +596,81 @@ Public Class frmMain
         frmWait.Instance.Owner = Me
 
         '作成中フォームをモードレスで表示
-        frmWait.Instance.Show()
+		frmWait.Instance.Show()
 
-        'フォルダファイルリストの入れ物を作成
-        Dim mFolderFileList As New FolderFileList(pPath)
+		'フォルダファイルリストの入れ物を作成
+		Dim mFolderFileList As New FolderFileList(pPath)
 
-        '処理進捗プロパティをセット
-        mFolderFileList.ProcessProgress = New Progress(Of FolderFileListProgress)(AddressOf ShowFolderFileListProgress)
+		'処理進捗プロパティをセット
+		mFolderFileList.ProcessProgress = New Progress(Of FolderFileListProgress)(AddressOf ShowFolderFileListProgress)
 
-        Try
+		Try
 
-            '非同期でフォルダファイルリストを作成する
-            Await Task.Run(
-                           Sub()
+			'非同期でフォルダファイルリストを作成する
+			Await Task.Run(
+						   Sub()
 
-                               'フォルダファイルリストを作成
-                               mFolderFileList.GetFolderFileList(mFolderFileList.TargetPath, mFolderFileList.FolderFileList)
+							   '対象フォルダ内のサブディレクトリとファイル数をセットする
+							   mFolderFileList.FileCountForTargetFolder = mFolderFileList.GetFileCountForTargetFolder()
 
-                               '出力文字列を作成
-                               mFolderFileList.SetOutputTextStringToFolderFileList(mFolderFileList.FolderFileList)
+							   'フォルダファイルリストを作成
+							   mFolderFileList.GetFolderFileList(mFolderFileList.TargetPath, mFolderFileList.FolderFileList)
 
-                           End Sub
-                          )
+							   '出力文字列を作成
+							   mFolderFileList.SetOutputTextStringToFolderFileList(mFolderFileList.FolderFileList)
 
-        Catch ex As Exception
+						   End Sub
+						  )
 
-            Throw
+		Catch ex As Exception
 
-        Finally
+			Throw
 
-            '作成中フォームを非表示
-            frmWait.Instance.Hide()
+		Finally
 
-            '作成中フォームのインスタンスを破棄
-            frmWait.DisposeInstance()
+			'作成中フォームを非表示
+			frmWait.Instance.Hide()
 
-        End Try
+			'作成中フォームのインスタンスを破棄
+			frmWait.DisposeInstance()
 
-        '時間の計測終了、経過時間を表示
-        '※デバッグモード時のみ実行される
-        DebugMode.StopDebugWatchShowProcessingTime("ﾌｫﾙﾀﾞﾌｧｲﾙﾘｽﾄ作成時間", "フォルダファイルリストの作成時間は")
+		End Try
 
-        '非同期でMessenger風通知メッセージが非表示になるまで待機
-        '※デバッグモード時のみ実行される
-        Await Task.Run(Sub() DebugMode.WaitTillClosingPopupMessage())
+		'時間の計測終了、経過時間を表示
+		'※デバッグモード時のみ実行される
+		DebugMode.StopDebugWatchShowProcessingTime("ﾌｫﾙﾀﾞﾌｧｲﾙﾘｽﾄ作成時間", "フォルダファイルリストの作成時間は")
 
-        Return mFolderFileList
+		'非同期でMessenger風通知メッセージが非表示になるまで待機
+		'※デバッグモード時のみ実行される
+		Await Task.Run(Sub() DebugMode.WaitTillClosingPopupMessage())
 
-    End Function
+		Return mFolderFileList
 
-    ''' <summary>フォルダファイルリスト作成中フォームへ進捗状況を表示</summary>
-    ''' <param name="pProgress">フォルダファイルリスト進捗状況報告用</param>
-    ''' <remarks></remarks>
-    Public Sub ShowFolderFileListProgress(ByVal pProgress As FolderFileListProgress)
+	End Function
 
-        'フォルダファイルリスト作成中フォームのプログレスバーに進捗率をセット
-        frmWait.Instance.tspbProgressRate.Value = pProgress.Percent
+	''' <summary>フォルダファイルリスト作成中フォームへ進捗状況を表示</summary>
+	''' <param name="pProgress">フォルダファイルリスト進捗状況報告用</param>
+	''' <remarks></remarks>
+	Public Sub ShowFolderFileListProgress(ByVal pProgress As FolderFileListProgress)
 
-        'フォルダファイルリスト作成中フォームのステータスを表示するラベルに進捗率をセット
-        frmWait.Instance.tsslStatus.Text = pProgress.Percent & "％完了"
+		'フォルダファイルリスト作成中ラベルが「対象フォルダ内のフォルダ・ファイル数を計算しています」の時
+		If frmWait.Instance.lblMaking.Text = frmWait._cMessage.Calculating Then
 
-        '処理フォルダファイルをセット
-        frmWait.Instance.tsslProcessingFolderFile.Text = pProgress.ProcessingFolderFile
+			'「対象フォルダ内のフォルダ・ファイル数を計算しています」文言からフォルダファイルリスト作成中に変更
+			frmWait.Instance.lblMaking.Text = frmWait._cMessage.Making
 
-    End Sub
+		End If
+
+		'フォルダファイルリスト作成中フォームのプログレスバーに進捗率をセット
+		frmWait.Instance.tspbProgressRate.Value = pProgress.Percent
+
+		'フォルダファイルリスト作成中フォームのステータスを表示するラベルに進捗率をセット
+		frmWait.Instance.tsslStatus.Text = pProgress.Percent & "％完了"
+
+		'処理フォルダファイルをセット
+		frmWait.Instance.tsslProcessingFolderFile.Text = pProgress.ProcessingFolderFile
+
+	End Sub
 
 #End Region
 
