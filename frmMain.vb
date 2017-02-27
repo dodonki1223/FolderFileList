@@ -596,28 +596,31 @@ Public Class frmMain
         frmWait.Instance.Owner = Me
 
         '作成中フォームをモードレスで表示
-        frmWait.Instance.Show()
+		frmWait.Instance.Show()
 
-        'フォルダファイルリストの入れ物を作成
-        Dim mFolderFileList As New FolderFileList(pPath)
+		'フォルダファイルリストの入れ物を作成
+		Dim mFolderFileList As New FolderFileList(pPath)
 
-        '処理進捗プロパティをセット
-        mFolderFileList.ProcessProgress = New Progress(Of FolderFileListProgress)(AddressOf ShowFolderFileListProgress)
+		'処理進捗プロパティをセット
+		mFolderFileList.ProcessProgress = New Progress(Of FolderFileListProgress)(AddressOf ShowFolderFileListProgress)
 
         Try
 
             '非同期でフォルダファイルリストを作成する
-            Await Task.Run(
-                           Sub()
+			Await Task.Run(
+						   Sub()
 
-                               'フォルダファイルリストを作成
-                               mFolderFileList.GetFolderFileList(mFolderFileList.TargetPath, mFolderFileList.FolderFileList)
+							   '対象フォルダ内のサブディレクトリとファイル数をセットする
+							   mFolderFileList.FileCountForTargetFolder = mFolderFileList.GetFileCountForTargetFolder()
 
-                               '出力文字列を作成
-                               mFolderFileList.SetOutputTextStringToFolderFileList(mFolderFileList.FolderFileList)
+							   'フォルダファイルリストを作成
+							   mFolderFileList.GetFolderFileList(mFolderFileList.TargetPath, mFolderFileList.FolderFileList)
 
-                           End Sub
-                          )
+							   '出力文字列を作成
+							   mFolderFileList.SetOutputTextStringToFolderFileList(mFolderFileList.FolderFileList)
+
+						   End Sub
+						  )
 
         Catch ex As Exception
 
@@ -649,6 +652,14 @@ Public Class frmMain
     ''' <param name="pProgress">フォルダファイルリスト進捗状況報告用</param>
     ''' <remarks></remarks>
     Public Sub ShowFolderFileListProgress(ByVal pProgress As FolderFileListProgress)
+
+		'フォルダファイルリスト作成中ラベルが「対象フォルダ内のフォルダ・ファイル数を計算しています」の時
+		If frmWait.Instance.lblMaking.Text = frmWait._cMessage.Calculating Then
+
+			'「対象フォルダ内のフォルダ・ファイル数を計算しています」文言からフォルダファイルリスト作成中に変更
+			frmWait.Instance.lblMaking.Text = frmWait._cMessage.Making
+
+		End If
 
         'フォルダファイルリスト作成中フォームのプログレスバーに進捗率をセット
         frmWait.Instance.tspbProgressRate.Value = pProgress.Percent

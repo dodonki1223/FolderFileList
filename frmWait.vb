@@ -15,17 +15,27 @@ Public Class frmWait
     ''' <remarks>１秒</remarks>
     Private Const _cTimeToSwitchingMakingString As Integer = 1000
 
-    ''' <summary>作成中文字列の共通メッセージ</summary>
-    ''' <remarks></remarks>
-    Private Const _cDisplayMakingMessage As String = "フォルダファイルリスト作成中"
+	''' <summary>フォルダファイルリスト作成中フォーム画面で使用するメッセージを提供する</summary>
+	''' <remarks></remarks>
+	Public Class _cMessage
 
-    ''' <summary>共通メッセージの後に表示する文字列「．」</summary>
-    ''' <remarks>作成中文字列の表示切り替えるまでの時間ごとこの文字列を増やしていく</remarks>
-    Private Const _cMaikingMessageDot As String = "．"
+		''' <summary>作成中文字列の共通メッセージ</summary>
+		''' <remarks></remarks>
+		Public Const Making As String = "フォルダファイルリスト作成中"
 
-    ''' <summary>共通メッセージの後に表示する文字列の最高カウント数</summary>
-    ''' <remarks></remarks>
-    Private Const _cMakingMessageDotMaxCount As Integer = 6
+		''' <summary>共通メッセージの後に表示する文字列「．」</summary>
+		''' <remarks>作成中文字列の表示切り替えるまでの時間ごとこの文字列を増やしていく</remarks>
+		Public Const MaikingDot As String = "．"
+
+		''' <summary>共通メッセージの後に表示する文字列の最高カウント数</summary>
+		''' <remarks></remarks>
+		Public Const MakingDotMaxCount As Integer = 6
+
+		''' <summary>フォルダ・ファイル数計算中</summary>
+		''' <remarks></remarks>
+		Public Const Calculating As String = "対象フォルダ内のフォルダ・ファイル数を計算しています"
+
+	End Class
 
 #End Region
 
@@ -190,25 +200,29 @@ Public Class frmWait
     ''' <param name="sender">Timerオブジェクト</param>
     ''' <param name="e">Tickイベント</param>
     ''' <remarks></remarks>
-    Public Sub _SwitchingMakingString(ByVal sender As Object, ByVal e As EventArgs)
+	Public Sub _SwitchingMakingString(ByVal sender As Object, ByVal e As EventArgs)
 
-        '「．」文字列をカウントする
-        Dim mDotCount As Integer = _GetCountCharForTargetChar(lblMaking.Text, _cMaikingMessageDot)
+		'フォルダファイルリスト作成中ラベルが「対象フォルダ内のフォルダ・ファイル数を計算しています」だったら処理を終了
+		'※フォルダファイルリスト作成中の時、「．」を増やすため
+		If lblMaking.Text = _cMessage.Calculating Then Exit Sub
 
-        '「．」文字列のカウント数が「．」文字列の最高カウント数と同じだったら
-        If mDotCount = _cMakingMessageDotMaxCount Then
+		'「．」文字列をカウントする
+		Dim mDotCount As Integer = _GetCountCharForTargetChar(lblMaking.Text, _cMessage.MaikingDot)
 
-            'フォームに共通メッセージ＋「．」をセット
-            lblMaking.Text = _cDisplayMakingMessage & _cMaikingMessageDot
+		'「．」文字列のカウント数が「．」文字列の最高カウント数と同じだったら
+		If mDotCount = _cMessage.MakingDotMaxCount Then
 
-        Else
+			'フォームに共通メッセージ＋「．」をセット
+			lblMaking.Text = _cMessage.Making & _cMessage.MaikingDot
 
-            'フォームに現在表示されている作成中文字列＋「．」をセット
-            lblMaking.Text = lblMaking.Text & _cMaikingMessageDot
+		Else
 
-        End If
+			'フォームに現在表示されている作成中文字列＋「．」をセット
+			lblMaking.Text = lblMaking.Text & _cMessage.MaikingDot
 
-    End Sub
+		End If
+
+	End Sub
 
 #End Region
 
@@ -229,6 +243,10 @@ Public Class frmWait
 
 		'最大化ボタンを非表示にする
 		Me.MaximizeBox = False
+
+		'メッセージ設定
+		Me.lblMaking.Text = _cMessage.Calculating
+		Me.tsslProcessingFolderFile.Text = String.Empty
 
 		'ウインドウをAlt+Tabに表示させない
 		MyBase.SetShowHideAltTabWindow(AltTabType.Hide)

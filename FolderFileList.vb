@@ -531,16 +531,29 @@ Public Class FolderFileList
     End Property
 
     ''' <summary>処理進捗プロパティ</summary>
-    ''' <remarks></remarks>
+	''' <remarks></remarks>
     Public WriteOnly Property ProcessProgress As IProgress(Of FolderFileListProgress)
 
         Set(value As IProgress(Of FolderFileListProgress))
 
-            _ProcessProgresss = value
+			_ProcessProgresss = value
 
         End Set
 
-    End Property
+	End Property
+
+	''' <summary>対象フォルダ内のサブディレクトリとファイル数プロパティ</summary>
+	''' <remarks>処理進捗を表示する場合はこのプロパティに値をセットすること</remarks>
+	Public WriteOnly Property FileCountForTargetFolder As Integer
+
+		Set(value As Integer)
+
+			'対象フォルダ内のサブディレクトリとファイル数をセット
+			_FolderFileListCount = GetFileCountForTargetFolder()
+
+		End Set
+
+	End Property
 
 #End Region
 
@@ -559,9 +572,6 @@ Public Class FolderFileList
 
         '対象パスをセット
         _TargetPath = pPath
-
-        'フォルダ・ファイルリストのファイル数をセット
-        _FolderFileListCount = _GetFileCountForTargetFolder()
 
         'フォルダファイルリストのDataTableのカラムを作成
         _FolderFileList = _CreateFolderFileListColumns()
@@ -619,8 +629,8 @@ Public Class FolderFileList
 
 #Region "対象フォルダ内のファイル数を取得"
 
-    ''' <summary>対象フォルダ内のサブディレクトリとファイル数を取得</summary>
-    ''' <returns>対象フォルダ内のサブディレクトリとファイル数</returns>
+	''' <summary>対象フォルダ内のサブディレクトリとファイル数を取得</summary>
+	''' <returns>対象フォルダ内のサブディレクトリとファイル数</returns>
 	''' <remarks>
 	'''  メモ：DirectoryクラスとDirectoryInfoクラスの違い
 	'''    Directoryクラスはstaticなメソッドばかりからなるユーティリティ的なクラ
@@ -632,12 +642,15 @@ Public Class FolderFileList
 	'''    されるが、DirectoryInfoクラスのインスタンス・メソッドでは必ずしもそう
 	'''    ではないといったことも記述されている                                  
 	''' </remarks>
-	Private Function _GetFileCountForTargetFolder() As Integer
+	Public Function GetFileCountForTargetFolder() As Integer
 
 		'対象フォルダ内のサブディレクトリとファイル数を取得
 		Dim mDI As New DirectoryInfo(_TargetPath)
-		Dim mFolderFileCount As Integer = mDI.GetFileSystemInfos("*", SearchOption.AllDirectories).Length
+		Dim mFolderFileCount As Integer = mDI.GetFileSystemInfos("*", SearchOption.AllDirectories).Length + 1
 		mDI = Nothing
+
+		'対象フォルダパスが含まれていないので＋１する
+		mFolderFileCount = mFolderFileCount + 1
 
 		Return mFolderFileCount
 
