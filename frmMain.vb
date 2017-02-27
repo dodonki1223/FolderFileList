@@ -582,73 +582,92 @@ Public Class frmMain
 
 #Region "フォルダファイルリスト作成"
 
-	''' <summary>フォルダファイルリストを作成</summary>
-	''' <param name="pPath">対象フォルダパス</param>
-	''' <returns>対象フォルダパスのフォルダファイルリスト</returns>
-	''' <remarks>フォルダファイルリストを非同期で作成し、作成中の時は作成中フォームを表示する</remarks>
-	Private Async Function _CreateFolderFileList(ByVal pPath As String) As Task(Of FolderFileList)
+    ''' <summary>フォルダファイルリストを作成</summary>
+    ''' <param name="pPath">対象フォルダパス</param>
+    ''' <returns>対象フォルダパスのフォルダファイルリスト</returns>
+    ''' <remarks>フォルダファイルリストを非同期で作成し、作成中の時は作成中フォームを表示する</remarks>
+    Private Async Function _CreateFolderFileList(ByVal pPath As String) As Task(Of FolderFileList)
 
-		'時間の計測開始
-		'※デバッグモード時のみ実行される
-		DebugMode.StartDebugWatch()
+        '時間の計測開始
+        '※デバッグモード時のみ実行される
+        DebugMode.StartDebugWatch()
 
-		'子フォームの親フォームにメインフォームを設定
-		frmWait.Instance.Owner = Me
+        '子フォームの親フォームにメインフォームを設定
+        frmWait.Instance.Owner = Me
 
-		'作成中フォームをモードレスで表示
-		frmWait.Instance.Show()
+        '作成中フォームをモードレスで表示
+        frmWait.Instance.Show()
 
-		'フォルダファイルリストの入れ物を作成
-		Dim mFolderFileList As New FolderFileList(pPath)
+        'フォルダファイルリストの入れ物を作成
+        Dim mFolderFileList As New FolderFileList(pPath)
 
-		Try
+        '処理進捗プロパティをセット
+        mFolderFileList.ProcessProgress = New Progress(Of FolderFileListProgress)(AddressOf ShowFolderFileListProgress)
 
-			'非同期でフォルダファイルリストを作成する
-			Await Task.Run(
-						   Sub()
+        Try
 
-							   'フォルダファイルリストを作成
-							   mFolderFileList.GetFolderFileList(mFolderFileList.TargetPath, mFolderFileList.FolderFileList)
+            '非同期でフォルダファイルリストを作成する
+            Await Task.Run(
+                           Sub()
 
-							   '出力文字列を作成
-							   mFolderFileList.SetOutputTextStringToFolderFileList(mFolderFileList.FolderFileList)
+                               'フォルダファイルリストを作成
+                               mFolderFileList.GetFolderFileList(mFolderFileList.TargetPath, mFolderFileList.FolderFileList)
 
-						   End Sub
-						 )
+                               '出力文字列を作成
+                               mFolderFileList.SetOutputTextStringToFolderFileList(mFolderFileList.FolderFileList)
 
-		Catch ex As Exception
+                           End Sub
+                          )
 
-			Throw
+        Catch ex As Exception
 
-		Finally
+            Throw
 
-			'作成中フォームを非表示
-			frmWait.Instance.Hide()
+        Finally
 
-			'作成中フォームのインスタンスを破棄
-			frmWait.DisposeInstance()
+            '作成中フォームを非表示
+            frmWait.Instance.Hide()
 
-		End Try
+            '作成中フォームのインスタンスを破棄
+            frmWait.DisposeInstance()
+
+        End Try
 
         '時間の計測終了、経過時間を表示
         '※デバッグモード時のみ実行される
-		DebugMode.StopDebugWatchShowProcessingTime("ﾌｫﾙﾀﾞﾌｧｲﾙﾘｽﾄ作成時間", "フォルダファイルリストの作成時間は")
+        DebugMode.StopDebugWatchShowProcessingTime("ﾌｫﾙﾀﾞﾌｧｲﾙﾘｽﾄ作成時間", "フォルダファイルリストの作成時間は")
 
-		'非同期でMessenger風通知メッセージが非表示になるまで待機
-		'※デバッグモード時のみ実行される
-		Await Task.Run(Sub() DebugMode.WaitTillClosingPopupMessage())
+        '非同期でMessenger風通知メッセージが非表示になるまで待機
+        '※デバッグモード時のみ実行される
+        Await Task.Run(Sub() DebugMode.WaitTillClosingPopupMessage())
 
         Return mFolderFileList
 
-	End Function
+    End Function
+
+    ''' <summary>フォルダファイルリスト作成中フォームへ進捗状況を表示</summary>
+    ''' <param name="pProgress">フォルダファイルリスト進捗状況報告用</param>
+    ''' <remarks></remarks>
+    Public Sub ShowFolderFileListProgress(ByVal pProgress As FolderFileListProgress)
+
+        'フォルダファイルリスト作成中フォームのプログレスバーに進捗率をセット
+        frmWait.Instance.tspbProgressRate.Value = pProgress.Percent
+
+        'フォルダファイルリスト作成中フォームのステータスを表示するラベルに進捗率をセット
+        frmWait.Instance.tsslStatus.Text = pProgress.Percent & "％完了"
+
+        '処理フォルダファイルをセット
+        frmWait.Instance.tsslProcessingFolderFile.Text = pProgress.ProcessingFolderFile
+
+    End Sub
 
 #End Region
 
 #Region "設定ファイルメソッド"
 
-	''' <summary>設定ファイルの内容を画面にセット</summary>
-	''' <remarks>Config.xmlファイルから取得した設定内容を画面に適用する</remarks>
-	Public Sub SetXmlFileSettingToScreen()
+    ''' <summary>設定ファイルの内容を画面にセット</summary>
+    ''' <remarks>Config.xmlファイルから取得した設定内容を画面に適用する</remarks>
+    Public Sub SetXmlFileSettingToScreen()
 
 		'設定ファイルの読み込み
 		Settings.LoadFromXmlFile()

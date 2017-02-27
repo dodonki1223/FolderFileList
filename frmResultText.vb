@@ -541,65 +541,84 @@ Public Class frmResultText
 
 		With mHtmlSentence
 
-			.AppendLine("<!DOCTYPE html>                                                                                                ")
-			.AppendLine("<html lang=""ja"">                                                                                             ")
-			.AppendLine("<head>                                                                                                         ")
-			.AppendLine("  <meta charset=""UTF-8"">                                                                                     ")
-			.AppendLine("  <title>フォルダファイルリスト</title>                                                                        ")
-			.AppendLine("</head>                                                                                                        ")
-			.AppendLine("<body>                                                                                                         ")
-			.AppendLine("  <header id=""header"">                                                                                       ")
-			.AppendLine("  </header>                                                                                                    ")
+			.AppendLine("<!DOCTYPE html>                                                                                                  ")
+			.AppendLine("<html lang=""ja"">                                                                                               ")
+			.AppendLine("  <head>                                                                                                         ")
+			.AppendLine("    <meta charset=""UTF-8"">                                                                                     ")
+			.AppendLine("    <style type=""text/css"">                                                                                    ")
+			.AppendLine("                                                                                                                 ")
+			.AppendLine("      /* Selectタグ設定 */                                                                                       ")
+			.AppendLine("      select {                                                                                                   ")
+			.AppendLine("        height:21px;                                                                                             ")
+			.AppendLine("      }                                                                                                          ")
+			.AppendLine("                                                                                                                 ")
+			.AppendLine("      /* Selectタグの項目の文字色は黒色 */                                                                       ")
+			.AppendLine("      option {                                                                                                   ")
+			.AppendLine("        color:#333;                                                                                              ")
+			.AppendLine("      }                                                                                                          ")
+			.AppendLine("                                                                                                                 ")
+			.AppendLine("    </style>                                                                                                     ")
+			.AppendLine("  </head>                                                                                                        ")
+			.AppendLine("  <body>                                                                                                         ")
+			.AppendLine("    <header id=""header"">                                                                                       ")
+			.AppendLine("    </header>                                                                                                    ")
 
-			.AppendLine("  <fieldset>                                                                                                   ")
-			.AppendLine("  <legend>絞り込み条件</legend>                                                                                ")
+			.AppendLine("    <fieldset>                                                                                                   ")
+			.AppendLine("    <legend>絞り込み条件</legend>                                                                                ")
 
 			'対象ファイル指定を作成
-			.AppendLine("    <div>                                                                                                      ")
-			.AppendLine("      <input type=""radio"" name=""displayTarget"" value=""全て表示"">全て表示</input>                         ")
-			.AppendLine("      <input type=""radio"" name=""displayTarget"" value=""フォルダのみ表示"">フォルダのみ表示</input>         ")
-			.AppendLine("      <input type=""radio"" name=""displayTarget"" value=""ファイルのみ表示"">ファイルのみ表示</input>         ")
-			.AppendLine("    </div>                                                                                                     ")
+			.AppendLine("      <div>                                                                                                      ")
+			.AppendLine("        <input type=""radio"" name=""displayTarget"" value=""全て表示"">全て表示</input>                         ")
+			.AppendLine("        <input type=""radio"" name=""displayTarget"" value=""フォルダのみ表示"">フォルダのみ表示</input>         ")
+			.AppendLine("        <input type=""radio"" name=""displayTarget"" value=""ファイルのみ表示"">ファイルのみ表示</input>         ")
+			.AppendLine("      </div>                                                                                                     ")
+
 			'拡張子選択領域を作成
-			.AppendLine("    <div>                                                                                                      ")
-			.AppendLine("      <div>                                                                                                    ")
-			.AppendLine("        <span>拡張子</span>                                                                                    ")
-			.AppendLine("      </div>                                                                                                   ")
-			.AppendLine("      <select name=""extension"">                                                                              ")
+			.AppendLine("      <div>                                                                                                      ")
+			.AppendLine("        <ul>                                                                                                      ")
+			.AppendLine("          <li>                                                                                                    ")
+			.AppendLine("            <select name=""extension"" >                                                                              ")
 
 			For Each mExtension As String In _FolderFileList.ExtensionList
 
-				.AppendLine("            <option value=""" & mExtension & """>" & mExtension & "</option>                                   ")
+				If mExtension = "" Then
+
+					.AppendLine("                  <option value=""" & mExtension & """ class=""not-select"">拡張子指定（未選択）</option>                                   ")
+
+				Else
+
+					.AppendLine("                  <option value=""" & mExtension & """>" & mExtension & "</option>                                   ")
+
+				End If
 
 			Next
 
-			.AppendLine("      </select>                                                                                                ")
-			.AppendLine("    </div>                                                                                                     ")
+			.AppendLine("            </select>                                                                                                ")
+			.AppendLine("          </li>                                                                                                    ")
+			.AppendLine("        </ul>                                                                                                      ")
+			.AppendLine("      </div>                                                                                                     ")
 
 			'テキスト入力ボックス
-			.AppendLine("    <div>                                                                                                      ")
-			.AppendLine("      <div>                                                                                                    ")
-			.AppendLine("        <span>名前(LIKE検索)</span>                                                                            ")
-			.AppendLine("      </div>                                                                                                   ")
-			.AppendLine("      <input type=""text"" name=""fileNameSearch""></input>                           ")
-			.AppendLine("    </div>                                                                                                       ")
+			.AppendLine("      <div>                                                                                                      ")
+			.AppendLine("        <input type=""text"" name=""fileNameSearch"" placeholder=""名前(LIKE検索)""></input>                               ")
+			.AppendLine("      </div>                                                                                                       ")
 
-			.AppendLine("  </fieldset>                                                                                                  ")
+			.AppendLine("    </fieldset>                                                                                                  ")
 
-			.AppendLine("  <div>                                                                                                        ")
-			.AppendLine("    <table>                                                                                                    ")
-			.AppendLine("      <tbody>                                                                                                  ")
-			.AppendLine("        <tr>                                                                                                   ")
+			.AppendLine("    <div>                                                                                                        ")
+			.AppendLine("      <table>                                                                                                    ")
+			.AppendLine("        <tbody>                                                                                                  ")
+			.AppendLine("          <tr>                                                                                                   ")
 
             'ヘッダーを作成する
-			.AppendLine("          <th>" & FolderFileListColumn.Name.ToString & "</th>                                                  ")
-			.AppendLine("          <th>" & FolderFileListColumn.UpdateDate.ToString & "</th>                                            ")
-			.AppendLine("          <th>" & FolderFileListColumn.FileSystemType.ToString & "</th>                                        ")
-			.AppendLine("          <th>" & FolderFileListColumn.SizeAndUnit.ToString & "</th>                                           ")
-			.AppendLine("          <th>" & FolderFileListColumn.Extension.ToString & "</th>                                             ")
-			.AppendLine("          <th>" & FolderFileListColumn.ParentFolder.ToString & "</th>                                          ")
+			.AppendLine("            <th>" & FolderFileListColumn.Name.ToString & "</th>                                                  ")
+			.AppendLine("            <th>" & FolderFileListColumn.UpdateDate.ToString & "</th>                                            ")
+			.AppendLine("            <th>" & FolderFileListColumn.FileSystemType.ToString & "</th>                                        ")
+			.AppendLine("            <th>" & FolderFileListColumn.SizeAndUnit.ToString & "</th>                                           ")
+			.AppendLine("            <th>" & FolderFileListColumn.Extension.ToString & "</th>                                             ")
+			.AppendLine("            <th>" & FolderFileListColumn.ParentFolder.ToString & "</th>                                          ")
 
-			.AppendLine("        </tr>                                                                                                  ")
+			.AppendLine("          </tr>                                                                                                  ")
 
 			'明細を作成する
 			For Each mDr As DataRow In _FolderFileList.FolderFileList.Rows
@@ -610,25 +629,65 @@ Public Class frmResultText
 				'親フォルダパスのURLを作成
 				Dim mParentFolderPathUrl As String = _CreateWindowOpenURL(mDr(FolderFileListColumn.ParentFolderFullPath))
 
-				.AppendLine("        <tr>                                                                                                   ")
-				.AppendLine("          <td><a href=""" & mFilePathUrl & """>" & mDr(FolderFileListColumn.Name) & "</a></td>                 ")
-				.AppendLine("          <td>" & mDr(FolderFileListColumn.UpdateDate) & "</td>                                                ")
-				.AppendLine("          <td>" & mDr(FolderFileListColumn.SizeAndUnit) & "</td>                                               ")
-				.AppendLine("          <td>" & mDr(FolderFileListColumn.FileSystemTypeName) & "</td>                                        ")
-				.AppendLine("          <td>" & mDr(FolderFileListColumn.Extension) & "</td>                                                 ")
-				.AppendLine("          <td><a href=""" & mParentFolderPathUrl & """>" & mDr(FolderFileListColumn.ParentFolder) & "</a></td> ")
-				.AppendLine("        </tr>                                                                                                  ")
+				.AppendLine("          <tr>                                                                                                   ")
+				.AppendLine("            <td><a href=""" & mFilePathUrl & """>" & mDr(FolderFileListColumn.Name) & "</a></td>                 ")
+				.AppendLine("            <td>" & mDr(FolderFileListColumn.UpdateDate) & "</td>                                                ")
+				.AppendLine("            <td>" & mDr(FolderFileListColumn.SizeAndUnit) & "</td>                                               ")
+				.AppendLine("            <td>" & mDr(FolderFileListColumn.FileSystemTypeName) & "</td>                                        ")
+				.AppendLine("            <td>" & mDr(FolderFileListColumn.Extension) & "</td>                                                 ")
+				.AppendLine("            <td><a href=""" & mParentFolderPathUrl & """>" & mDr(FolderFileListColumn.ParentFolder) & "</a></td> ")
+				.AppendLine("          </tr>                                                                                                  ")
 
 			Next
 
-			.AppendLine("      </tbody>                                                                                                 ")
-			.AppendLine("    </table>                                                                                                   ")
-			.AppendLine("  </div>                                                                                                       ")
-			.AppendLine("  <footer id=""footer"">                                                                                       ")
-			.AppendLine("    <p>copyright kobashi</p>                                                                                   ")
-			.AppendLine("  </footer>                                                                                                    ")
-			.AppendLine("</body>                                                                                                        ")
-			.AppendLine("</html>                                                                                                        ")
+			.AppendLine("        </tbody>                                                                                                 ")
+			.AppendLine("      </table>                                                                                                   ")
+			.AppendLine("    </div>                                                                                                       ")
+			.AppendLine("    <footer id=""footer"">                                                                                       ")
+			.AppendLine("      <p>copyright kobashi</p>                                                                                   ")
+			.AppendLine("    </footer>                                                                                                    ")
+			.AppendLine("    <script src=""https://code.jquery.com/jquery-2.2.0.min.js"" type=""text/javascript""></script>               ")
+			.AppendLine("    <script type=""text/javascript"">                                                                            ")
+			.AppendLine("                                                                                                                 ")
+			.AppendLine("      /**                                                                                                        ")
+			.AppendLine("       * Selectタグで最初に表示する項目の文字色を灰色表示にします                                                ")
+			.AppendLine("       */                                                                                                        ")
+			.AppendLine("      function setSelectTagColor() {                                                                             ")
+			.AppendLine("                                                                                                                 ")
+			.AppendLine("        // Selectタグで選択されている要素が「not-select」というクラスを持っていた時                              ")
+			.AppendLine("        if($('select').find('option:selected').hasClass('not-select')){                                          ")
+			.AppendLine("                                                                                                                 ")
+			.AppendLine("          // 文字色を灰色に変更                                                                                  ")
+			.AppendLine("          $('select').css({'color':'#A9A9A9'});                                                                  ")
+			.AppendLine("                                                                                                                 ")
+			.AppendLine("        }                                                                                                        ")
+			.AppendLine("                                                                                                                 ")
+			.AppendLine("        //項目が変更された時、条件によって色変更                                                                 ")
+			.AppendLine("        $('select').on('change', function(){                                                                     ")
+			.AppendLine("                                                                                                                 ")
+			.AppendLine("          // Selectタグで選択されている要素が「not-select」というクラスを持っていた時                            ")
+			.AppendLine("          if($(this).find('option:selected').hasClass('not-select')) {                                           ")
+			.AppendLine("                                                                                                                 ")
+			.AppendLine("            // 文字色を灰色に変更                                                                                ")
+			.AppendLine("            $(this).css({'color':'#ccc'});                                                                       ")
+			.AppendLine("                                                                                                                 ")
+			.AppendLine("          } else {                                                                                               ")
+			.AppendLine("                                                                                                                 ")
+			.AppendLine("            // 文字色を黒色に変更                                                                                ")
+			.AppendLine("            $(this).css({'color':'#333'});                                                                       ")
+			.AppendLine("                                                                                                                 ")
+			.AppendLine("          }                                                                                                      ")
+			.AppendLine("                                                                                                                 ")
+			.AppendLine("        });                                                                                                      ")
+			.AppendLine("                                                                                                                 ")
+			.AppendLine("      }                                                                                                          ")
+			.AppendLine("                                                                                                                 ")
+			.AppendLine("      // Selectタグの最初に表示する項目の文字色を灰色表示に変更                                                  ")
+			.AppendLine("      setSelectTagColor();                                                                                       ")
+			.AppendLine("                                                                                                                 ")
+			.AppendLine("    </script>                                                                                                    ")
+			.AppendLine("  </body>                                                                                                        ")
+			.AppendLine("</html>                                                                                                          ")
 
 		End With
 
