@@ -586,16 +586,16 @@ Public Class frmMain
     ''' <param name="pPath">対象フォルダパス</param>
     ''' <returns>対象フォルダパスのフォルダファイルリスト</returns>
     ''' <remarks>フォルダファイルリストを非同期で作成し、作成中の時は作成中フォームを表示する</remarks>
-    Private Async Function _CreateFolderFileList(ByVal pPath As String) As Task(Of FolderFileList)
+	Private Async Function _CreateFolderFileList(ByVal pPath As String) As Task(Of FolderFileList)
 
-        '時間の計測開始
-        '※デバッグモード時のみ実行される
-        DebugMode.StartDebugWatch()
+		'時間の計測開始
+		'※デバッグモード時のみ実行される
+		DebugMode.StartDebugWatch()
 
-        '子フォームの親フォームにメインフォームを設定
-        frmWait.Instance.Owner = Me
+		'子フォームの親フォームにメインフォームを設定
+		frmWait.Instance.Owner = Me
 
-        '作成中フォームをモードレスで表示
+		'作成中フォームをモードレスで表示
 		frmWait.Instance.Show()
 
 		'フォルダファイルリストの入れ物を作成
@@ -604,9 +604,9 @@ Public Class frmMain
 		'処理進捗プロパティをセット
 		mFolderFileList.ProcessProgress = New Progress(Of FolderFileListProgress)(AddressOf ShowFolderFileListProgress)
 
-        Try
+		Try
 
-            '非同期でフォルダファイルリストを作成する
+			'非同期でフォルダファイルリストを作成する
 			Await Task.Run(
 						   Sub()
 
@@ -622,31 +622,31 @@ Public Class frmMain
 						   End Sub
 						  )
 
-        Catch ex As Exception
+		Catch ex As Exception
 
-            Throw
+			Throw
 
-        Finally
+		Finally
 
-            '作成中フォームを非表示
-            frmWait.Instance.Hide()
+			'作成中フォームを非表示
+			frmWait.Instance.Hide()
 
-            '作成中フォームのインスタンスを破棄
-            frmWait.DisposeInstance()
+			'作成中フォームのインスタンスを破棄
+			frmWait.DisposeInstance()
 
-        End Try
+		End Try
 
-        '時間の計測終了、経過時間を表示
-        '※デバッグモード時のみ実行される
-        DebugMode.StopDebugWatchShowProcessingTime("ﾌｫﾙﾀﾞﾌｧｲﾙﾘｽﾄ作成時間", "フォルダファイルリストの作成時間は")
+		'時間の計測終了、経過時間を表示
+		'※デバッグモード時のみ実行される
+		DebugMode.StopDebugWatchShowProcessingTime("ﾌｫﾙﾀﾞﾌｧｲﾙﾘｽﾄ作成時間", "フォルダファイルリストの作成時間は")
 
-        '非同期でMessenger風通知メッセージが非表示になるまで待機
-        '※デバッグモード時のみ実行される
-        Await Task.Run(Sub() DebugMode.WaitTillClosingPopupMessage())
+		'非同期でMessenger風通知メッセージが非表示になるまで待機
+		'※デバッグモード時のみ実行される
+		Await Task.Run(Sub() DebugMode.WaitTillClosingPopupMessage())
 
-        Return mFolderFileList
+		Return mFolderFileList
 
-    End Function
+	End Function
 
     ''' <summary>フォルダファイルリスト作成中フォームへ進捗状況を表示</summary>
     ''' <param name="pProgress">フォルダファイルリスト進捗状況報告用</param>
