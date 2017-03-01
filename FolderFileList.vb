@@ -530,7 +530,7 @@ Public Class FolderFileList
 
     End Property
 
-    ''' <summary>処理進捗プロパティ</summary>
+	''' <summary>処理進捗プロパティ</summary>
 	''' <remarks></remarks>
 	Public WriteOnly Property ProcessProgress As IProgress(Of FolderFileListProgress)
 
@@ -1013,6 +1013,7 @@ Public Class FolderFileList
 		'拡張子項目でグループ化（ファイル項目のみを抽出）し、空文字を除くクエリーを作成
 		'※拡張子はすべて小文字に変換する（大文字と小文字違いの拡張子をリストに表示させないため）
 		Dim mQuery = From Extensions In pFolderFileList
+					 Order By Extensions(FolderFileListColumn.Extension) Ascending
 					 Where Extensions(FolderFileListColumn.FileSystemType.ToString) = FileSystemType.File
 					 Group By Extension = Extensions(FolderFileListColumn.Extension).ToString.ToLower()
 					 Into Group

@@ -586,16 +586,16 @@ Public Class frmMain
     ''' <param name="pPath">対象フォルダパス</param>
     ''' <returns>対象フォルダパスのフォルダファイルリスト</returns>
     ''' <remarks>フォルダファイルリストを非同期で作成し、作成中の時は作成中フォームを表示する</remarks>
-    Private Async Function _CreateFolderFileList(ByVal pPath As String) As Task(Of FolderFileList)
+	Private Async Function _CreateFolderFileList(ByVal pPath As String) As Task(Of FolderFileList)
 
-        '時間の計測開始
-        '※デバッグモード時のみ実行される
-        DebugMode.StartDebugWatch()
+		'時間の計測開始
+		'※デバッグモード時のみ実行される
+		DebugMode.StartDebugWatch()
 
-        '子フォームの親フォームにメインフォームを設定
-        frmWait.Instance.Owner = Me
+		'子フォームの親フォームにメインフォームを設定
+		frmWait.Instance.Owner = Me
 
-        '作成中フォームをモードレスで表示
+		'作成中フォームをモードレスで表示
 		frmWait.Instance.Show()
 
 		'フォルダファイルリストの入れ物を作成
