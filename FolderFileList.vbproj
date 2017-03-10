@@ -160,6 +160,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="OutputDelimiterText.vb" />
+    <Compile Include="OutputHtml.vb" />
     <Compile Include="Settings.vb" />
   </ItemGroup>
   <ItemGroup>

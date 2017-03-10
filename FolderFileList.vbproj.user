@@ -12,6 +12,6 @@
     <VerifyUploadedFiles>false</VerifyUploadedFiles>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <StartArguments>/form=Text /OutPut=ClipBoard "C:\Program Files\Internet Explorer"</StartArguments>
+    <StartArguments>/form=List /OutPut=SaveDialog /Extension=html "C:\Program Files\Internet Explorer"</StartArguments>
   </PropertyGroup>
 </Project>

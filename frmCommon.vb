@@ -119,6 +119,68 @@ Public Class frmCommon
 
 	End Sub
 
+	''' <summary>ユーザーに対話メッセージボックス</summary>
+	''' <param name="pFileFormat">出力形式</param>
+	''' <returns>ダイアログボックスの戻り値</returns>
+	''' <remarks></remarks>
+	Public Function ShowDialogueMessage(ByVal pFileFormat As String) As Windows.Forms.DialogResult
+
+		'メッセージボックスを表示しユーザーに対話
+		Dim mMsgBoxTitle As String = pFileFormat & "出力"
+		Dim mMsgBoxText As String = "はい　：" & pFileFormat & "ファイルを保存します" & System.Environment.NewLine &
+									"いいえ：クリップボードに" & pFileFormat & "形式のテキストを保存します"
+
+		Return MessageBox.Show(mMsgBoxText, mMsgBoxTitle, MessageBoxButtons.YesNo)
+
+	End Function
+
+	''' <summary>名前を付けて保存ダイアログを取得</summary>
+	''' <param name="pSaveFileName">保存ファイル名</param>
+	''' <param name="pFileFormat">ファイル形式</param>
+	''' <param name="pDirectory">起動ディレクトリ</param>
+	''' <returns>ファイル形式にあった設定の名前を付けて保存ダイアログ</returns>
+	''' <remarks>ファイル形式用の名前を付けて保存ダイアログを作成し返す</remarks>
+	Public Function GetSaveAsDialog(ByVal pSaveFileName As String, ByVal pFileFormat As String, Optional ByVal pDirectory As String = "") As SaveFileDialog
+
+		'大文字、小文字の区切り文字を取得
+		Dim mFileFormatUpperCase As String = pFileFormat.ToUpper
+		Dim mFileFormatLowerCase As String = pFileFormat.ToLower
+
+		'名前を付けて保存ダイアログを表示
+		Dim mDailog As New SaveFileDialog
+		With mDailog
+
+			'デフォルトファイル設定（保存ファイル名＋.区切り文字）
+			.FileName = pSaveFileName & "." & mFileFormatLowerCase
+
+			'表示ファイル設定
+			.Filter = mFileFormatUpperCase & "ファイル(*." & mFileFormatLowerCase & ")|*." & mFileFormatLowerCase & "|すべてのファイル(*.*)|*.*"
+
+			'起動ディレクトリ設定
+			.InitialDirectory = pDirectory
+
+		End With
+
+		Return mDailog
+
+	End Function
+
+	''' <summary>文字列を指定ファイルに書き込む</summary>
+	''' <param name="pWriteText">書き込むテキスト</param>
+	''' <param name="pOutputPath">指定ファイル（出力先フルパス）</param>
+	''' <param name="pEncoding">使用する文字エンコーディング</param>
+	''' <remarks>指定されたファイルが存在しない場合はファイルを作成して書き込む
+	'''          指定されたファイルが存在する場合はファイルを上書きして書き込む</remarks>
+	Public Sub WriteTextToOutputFile(ByVal pWriteText As String, ByVal pOutputPath As String, ByVal pEncoding As System.Text.Encoding)
+
+		Using mSW As New System.IO.StreamWriter(pOutputPath, False, pEncoding)
+
+			mSW.Write(pWriteText)
+
+		End Using
+
+	End Sub
+
 #End Region
 
 End Class

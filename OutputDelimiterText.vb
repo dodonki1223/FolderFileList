@@ -269,27 +269,6 @@ Public Class OutputDelimiterText
 
 	End Function
 
-#End Region
-
-#Region "外部公開メソッド"
-
-	''' <summary>文字列をダブルクォーテションで囲む</summary>
-	''' <param name="pField">対象文字列</param>
-	''' <returns>ダブルクォーテーションで囲んだ文字列</returns>
-	''' <remarks></remarks>
-	Public Shared Function EncloseDoubleQuotes(pField As String) As String
-
-		If pField.IndexOf(""""c) > -1 Then
-
-			'「"」を「""」とする
-			pField = pField.Replace("""", """""")
-
-		End If
-
-		Return """" & pField & """"
-
-	End Function
-
 	''' <summary>配列から１行分のデータを作成する</summary>
 	''' <param name="pArrayData">対象配列</param>
 	''' <param name="pDelimiter">区切り文字</param>
@@ -308,6 +287,27 @@ Public Class OutputDelimiterText
 		Next
 
 		Return mRowData
+
+	End Function
+
+#End Region
+
+#Region "外部公開メソッド"
+
+	''' <summary>文字列をダブルクォーテションで囲む</summary>
+	''' <param name="pField">対象文字列</param>
+	''' <returns>ダブルクォーテーションで囲んだ文字列</returns>
+	''' <remarks></remarks>
+	Public Shared Function EncloseDoubleQuotes(pField As String) As String
+
+		If pField.IndexOf(""""c) > -1 Then
+
+			'「"」を「""」とする
+			pField = pField.Replace("""", """""")
+
+		End If
+
+		Return """" & pField & """"
 
 	End Function
 

@@ -1,6 +1,7 @@
 ﻿Option Explicit On
 
 Imports FolderFileList.FolderFileList
+Imports FolderFileList.CommandLine
 Imports System.Linq
 
 ''' <summary>フォルダファイルリストをGridViewに表示するフォームを提供する</summary>
@@ -13,46 +14,6 @@ Public Class frmResultGridView
     ''' <summary>フォルダファイルリストのヘッダー情報を提供する</summary>
     ''' <remarks></remarks>
     Public Class cFolderFileListHeaders
-
-        ''' <summary>ヘッダー名</summary>
-        ''' <remarks></remarks>
-        Public Enum HeaderName
-
-			NO
-
-			ﾌｧｲﾙ名
-
-            更新日時
-
-			ﾌｧｲﾙｼｽﾃﾑﾀｲﾌﾟ値
-
-            ﾌｧｲﾙｼｽﾃﾑﾀｲﾌﾟ
-
-            拡張子
-
-			ﾌｧｲﾙｻｲｽﾞ単位無し
-
-            ﾌｧｲﾙｻｲｽﾞ
-
-			ﾌｧｲﾙｻｲｽﾞﾚﾍﾞﾙ値
-
-            ﾌｧｲﾙｻｲｽﾞﾚﾍﾞﾙ
-
-			ﾃﾞｨﾚｸﾄﾘﾚﾍﾞﾙ
-
-            親ﾌｫﾙﾀﾞ
-
-			親ﾌｫﾙﾀﾞﾌﾙﾊﾟｽ
-
-			対象ﾌｫﾙﾀﾞ以下
-
-			ﾌﾙﾊﾟｽ
-
-			最後のﾌｧｲﾙか
-
-            表示文字列
-
-        End Enum
 
         ''' <summary>区切り文字用ヘッダー名</summary>
         ''' <remarks></remarks>
@@ -86,7 +47,7 @@ Public Class frmResultGridView
 			Dim mHeaderNames As New ArrayList
 
 			'ヘッダー用の名前をArrayListに追加していく
-			For Each mColumnName As String In System.Enum.GetNames(GetType(HeaderName))
+			For Each mColumnName As String In System.Enum.GetNames(GetType(FolderFileListJapaneseColumn))
 
 				mHeaderNames.Add(mColumnName)
 
@@ -152,6 +113,10 @@ Public Class frmResultGridView
 		Public Shared ReadOnly Desceding As System.Drawing.Color = Color.LightSkyBlue
 
 	End Class
+
+	''' <summary>Html出力ファイル形式</summary>
+	''' <remarks></remarks>
+	Private Const _cOutputHtmlFileFormat As String = "HTML"
 
 	''' <summary>１ページ内に表示できるファイル数</summary>
 	''' <remarks>フォルダファイルリストGridViewの1ページに表示される最大件数（デフォルト値）</remarks>
@@ -579,13 +544,17 @@ Public Class frmResultGridView
 
 					btnResultTextForm.PerformClick()
 
+				Case "H" 'Shift+H：「Html出力」ボタンをクリック
+
+					btnHtmlOutput.PerformClick()
+
 				Case "C" 'Shift+C：「CSV出力」ボタンをクリック
 
-					btnCSV.PerformClick()
+					btnCsvOutput.PerformClick()
 
 				Case "T" 'Shift+T：「TSV出力」ボタンをクリック
 
-					btnTSV.PerformClick()
+					btnTsvOutput.PerformClick()
 
 				Case "P" 'Shift+P：「前へ」ボタンをクリック
 
@@ -617,7 +586,7 @@ Public Class frmResultGridView
 		If frmResultText.HasInstance Then
 
 			'設定ファイルへ書き込み処理
-			Settings.Instance.TargetForm = Settings.FormType.List
+			Settings.Instance.TargetForm = CommandLine.FormType.List
 			Settings.SaveToXmlFile()
 
 			'メインフォームに設定ファイルの内容を適用する
@@ -742,20 +711,20 @@ Public Class frmResultGridView
 	''' <param name="sender">CSV出力ボタン</param>
 	''' <param name="e">Clickイベント</param>
 	''' <remarks></remarks>
-	Private Async Sub btnCSV_Click(sender As Object, e As EventArgs) Handles btnCSV.Click
+	Private Async Sub btnCsvOutput_Click(sender As Object, e As EventArgs) Handles btnCsvOutput.Click
 
 		'メッセージボックスから押されたボタンにより処理を分岐
-		Select Case _ShowDialogueMessage(OutputDelimiterText.Delimiter.CSV)
+		Select Case MyBase.ShowDialogueMessage(OutputDelimiterText.Delimiter.CSV.ToString)
 
 			Case Windows.Forms.DialogResult.Yes
 
 				'CSVファイル保存処理
-				Call _SaveOutPutTextFile(OutputDelimiterText.Delimiter.CSV)
+				Call _SaveOutputFile(OutputFileFormat.CSV, _FolderFileList.TargetPathFolderName, cEncording.ShiftJis)
 
 			Case Windows.Forms.DialogResult.No
 
-				'CSVテキストクリップボードコピー
-				Call _SaveOutPutTextFileToClipBoard(OutputDelimiterText.Delimiter.CSV)
+				'出力用テキストをクリップボードコピー
+				Clipboard.SetText(_GetOutputFileText(OutputFileFormat.CSV))
 
 				'クリップボードにコピーしました通知を表示
 				Dim mFrmPopupMessage As New frmPopupMessage(_cMessage.NoticeMessageTitle, _cMessage.NoticeMessageBeforeDetail & OutputDelimiterText.Delimiter.CSV.ToString & _cMessage.NoticeMessageAfterDetail)
@@ -772,23 +741,20 @@ Public Class frmResultGridView
 	''' <param name="sender">TSV出力ボタン</param>
 	''' <param name="e">Clickイベント</param>
 	''' <remarks></remarks>
-	Private Async Sub btnTSV_Click(sender As Object, e As EventArgs) Handles btnTSV.Click
+	Private Async Sub btnTsvOutput_Click(sender As Object, e As EventArgs) Handles btnTsvOutput.Click
 
 		'メッセージボックスから押されたボタンにより処理を分岐
-		Select Case _ShowDialogueMessage(OutputDelimiterText.Delimiter.TSV)
+		Select Case MyBase.ShowDialogueMessage(OutputDelimiterText.Delimiter.TSV.ToString)
 
 			Case Windows.Forms.DialogResult.Yes
 
 				'TSVファイル保存処理
-				Call _SaveOutPutTextFile(OutputDelimiterText.Delimiter.TSV)
+				Call _SaveOutputFile(OutputFileFormat.TSV, _FolderFileList.TargetPathFolderName, cEncording.ShiftJis)
 
 			Case Windows.Forms.DialogResult.No
 
-				'画面に表示しているGridViewデータから出力用テキストのデータを作成
-				Dim mTsvData As OutputDelimiterText = _CreateOutputTextData(_CurrentGridView.Data.Copy(), OutputDelimiterText.Delimiter.TSV)
-
-				'TSVテキストクリップボードコピー
-				Call _SaveOutPutTextFileToClipBoard(OutputDelimiterText.Delimiter.TSV)
+				'出力用テキストをクリップボードコピー
+				Clipboard.SetText(_GetOutputFileText(OutputFileFormat.TSV))
 
 				'クリップボードにコピーしました通知を表示
 				Dim mFrmPopupMessage As New frmPopupMessage(_cMessage.NoticeMessageTitle, _cMessage.NoticeMessageBeforeDetail & OutputDelimiterText.Delimiter.TSV.ToString & _cMessage.NoticeMessageAfterDetail)
@@ -798,6 +764,17 @@ Public Class frmResultGridView
 				Await Task.Run(Sub() System.Threading.Thread.Sleep(frmPopupMessage._cMessageDisplayTotalTime))
 
 		End Select
+
+	End Sub
+
+	''' <summary>html出力ボタンクリックイベント</summary>
+	''' <param name="sender">html出力ボタン</param>
+	''' <param name="e">Clickイベント</param>
+	''' <remarks></remarks>
+	Private Sub btnHtmlOutput_Click(sender As Object, e As EventArgs) Handles btnHtmlOutput.Click
+
+		'Htmlファイル保存処理
+		Call _SaveOutputFile(OutputFileFormat.HTML, _FolderFileList.TargetPathFolderName, cEncording.UTF8)
 
 	End Sub
 
@@ -1160,9 +1137,9 @@ Public Class frmResultGridView
 					'ページング関係のコントロールの場合はフォームの幅の変更分、左の位置を変更する
 					mTargetControl.Left = mTargetControl.Left + pChangedSize.Width
 
-				Case btnTSV.Name, btnCSV.Name
+				Case btnHtmlOutput.Name, btnCsvOutput.Name, btnTsvOutput.Name
 
-					'CSV出力ボタン、TSV出力ボタンの場合はフォームのサイズの変更分、表示位置を変更する
+					'Html出力ボタン、CSV出力ボタン、TSV出力ボタンの場合はフォームのサイズの変更分、表示位置を変更する
 					mTargetControl.Location = New System.Drawing.Point(mTargetControl.Location + pChangedSize)
 
 				Case btnResultTextForm.Name
@@ -1600,26 +1577,60 @@ Public Class frmResultGridView
 
 #End Region
 
-#Region "「CSV・TSV」出力用メソッド"
+#Region "「Html・CSV・TSV」出力用メソッド"
 
-	''' <summary>出力テキスト用のデータに変換</summary>
-	''' <param name="pData">GridViewに表示しているデータ</param>
-	''' <returns>出力テキスト用のデータ</returns>
-	''' <remarks>出力テキスト用に不必要なカラムを削除して返す
-	'''          GridViewに表示されていないカラムを削除する  </remarks>
-	Private Function _ConvertOutputTextData(ByVal pData As DataTable)
+	''' <summary>出力ファイルの保存処理</summary>
+	''' <param name="pFileFormat">出力形式</param>
+	''' <param name="pDefalutFileName">保存ファイルのデフォルトのファイル名</param>
+	''' <param name="pEncording">エンコード</param>
+	''' <remarks></remarks>
+	Private Sub _SaveOutputFile(ByVal pFileFormat As OutputFileFormat, ByVal pDefalutFileName As String, ByVal pEncording As System.Text.Encoding)
 
-		'出力テキスト用に不必要なカラム情報を削除する
-		pData.Columns.Remove(FolderFileListColumn.No.ToString)
-		pData.Columns.Remove(FolderFileListColumn.FileSystemType.ToString)
-		pData.Columns.Remove(FolderFileListColumn.Size.ToString)
-		pData.Columns.Remove(FolderFileListColumn.SizeLevel.ToString)
-		pData.Columns.Remove(FolderFileListColumn.DirectoryLevel.ToString)
-		pData.Columns.Remove(FolderFileListColumn.ParentFolderFullPath.ToString)
-		pData.Columns.Remove(FolderFileListColumn.IsLastFileInFolder.ToString)
-		pData.Columns.Remove(FolderFileListColumn.DispString.ToString)
+		'名前を付けて保存ダイアログを表示
+		Dim mDailog As SaveFileDialog = MyBase.GetSaveAsDialog(pDefalutFileName, pFileFormat.ToString.ToLower)
 
-		Return pData
+		'名前をつけて保存ダイアログでOKが押されたら
+		If mDailog.ShowDialog = Windows.Forms.DialogResult.OK Then
+
+			'ファイルの保存処理
+			MyBase.WriteTextToOutputFile(_GetOutputFileText(pFileFormat), mDailog.FileName, pEncording)
+
+		End If
+
+	End Sub
+
+	''' <summary>出力用ファイルのテキストデータを取得</summary>
+	''' <param name="pFileFormat">出力形式</param>
+	''' <returns>対象出力形式のテキストデータ</returns>
+	''' <remarks></remarks>
+	Private Function _GetOutputFileText(ByVal pFileFormat As OutputFileFormat) As String
+
+		Dim mOutputText As String = String.Empty
+
+		'出力形式ごと処理を分岐
+		Select Case pFileFormat
+
+			Case OutputFileFormat.CSV
+
+				'画面に表示しているGridViewデータからCSV用テキストのデータを作成
+				Dim mOutputCSV As OutputDelimiterText = _CreateOutputTextData(_CurrentGridView.Data.Copy(), OutputDelimiterText.Delimiter.CSV)
+				mOutputText = mOutputCSV.AllOutputText
+
+			Case OutputFileFormat.TSV
+
+				'画面に表示しているGridViewデータからTSV用テキストのデータを作成
+				Dim mOutputTSV As OutputDelimiterText = _CreateOutputTextData(_CurrentGridView.Data.Copy(), OutputDelimiterText.Delimiter.TSV)
+				mOutputText = mOutputTSV.AllOutputText
+
+			Case OutputFileFormat.HTML
+
+				'フォルダファイルリストから出力用のHtml文字列を取得
+				Dim mOutputHtml As New OutputHtml(_FolderFileList, CommandLine.FormType.List)
+				mOutputText = mOutputHtml.HtmlSentence
+
+		End Select
+
+		Return mOutputText
 
 	End Function
 
@@ -1647,95 +1658,26 @@ Public Class frmResultGridView
 
 	End Function
 
-	''' <summary>出力用テキスト保存処理</summary>
-	''' <param name="pDelimiter">区切り文字</param>
-	''' <remarks></remarks>
-	Private Sub _SaveOutPutTextFile(ByVal pDelimiter As OutputDelimiterText.Delimiter)
+	''' <summary>出力テキスト用のデータに変換</summary>
+	''' <param name="pData">GridViewに表示しているデータ</param>
+	''' <returns>出力テキスト用のデータ</returns>
+	''' <remarks>出力テキスト用に不必要なカラムを削除して返す
+	'''          GridViewに表示されていないカラムを削除する  </remarks>
+	Private Function _ConvertOutputTextData(ByVal pData As DataTable)
 
-		'名前を付けて保存ダイアログを表示
-		Dim mDailog As SaveFileDialog = _GetSaveAsDialog(pDelimiter)
+		'出力テキスト用に不必要なカラム情報を削除する
+		pData.Columns.Remove(FolderFileListColumn.No.ToString)
+		pData.Columns.Remove(FolderFileListColumn.FileSystemType.ToString)
+		pData.Columns.Remove(FolderFileListColumn.Size.ToString)
+		pData.Columns.Remove(FolderFileListColumn.SizeLevel.ToString)
+		pData.Columns.Remove(FolderFileListColumn.DirectoryLevel.ToString)
+		pData.Columns.Remove(FolderFileListColumn.ParentFolderFullPath.ToString)
+		pData.Columns.Remove(FolderFileListColumn.IsLastFileInFolder.ToString)
+		pData.Columns.Remove(FolderFileListColumn.DispString.ToString)
 
-		If mDailog.ShowDialog = Windows.Forms.DialogResult.OK Then
-
-			'画面に表示しているGridViewデータから出力用テキストのデータを作成
-			Dim mOutPutData As OutputDelimiterText = _CreateOutputTextData(_CurrentGridView.Data.Copy(), pDelimiter)
-
-			'ファイルの保存処理
-			Call _WriteTextToOutputFile(mOutPutData.AllOutputText, mDailog.FileName, cEncording.ShiftJis)
-
-		End If
-
-	End Sub
-
-	''' <summary>出力用テキストデータをクリップボードに保存</summary>
-	''' <param name="pDelimiter">区切り文字</param>
-	''' <remarks></remarks>
-	Private Sub _SaveOutPutTextFileToClipBoard(ByVal pDelimiter As OutputDelimiterText.Delimiter)
-
-		'画面に表示しているGridViewデータから出力用テキストのデータを作成
-		Dim mOutPutData As OutputDelimiterText = _CreateOutputTextData(_CurrentGridView.Data.Copy(), pDelimiter)
-
-		'出力用テキストをクリップボードコピー
-		Clipboard.SetText(mOutPutData.AllOutputText)
-
-	End Sub
-
-	''' <summary>ユーザーに対話メッセージボックス</summary>
-	''' <param name="pDelimiter">区切り文字</param>
-	''' <returns>ダイアログボックスの戻り値</returns>
-	''' <remarks></remarks>
-	Private Function _ShowDialogueMessage(ByVal pDelimiter As OutputDelimiterText.Delimiter) As Windows.Forms.DialogResult
-
-		'メッセージボックスを表示しユーザーに対話
-		Dim mMsgBoxTitle As String = pDelimiter.ToString & "出力"
-		Dim mMsgBoxText As String = "はい　：" & pDelimiter.ToString & "ファイルを保存します" & ControlChars.CrLf & _
-									"いいえ：クリップボードに" & pDelimiter.ToString & "形式のテキストを保存します"
-
-		Return MessageBox.Show(mMsgBoxText, mMsgBoxTitle, MessageBoxButtons.YesNo)
+		Return pData
 
 	End Function
-
-	''' <summary>名前を付けて保存ダイアログを取得</summary>
-	''' <param name="pDelimiter">区切り文字</param>
-	''' <returns>区切り文字にあった設定の名前を付けて保存ダイアログ</returns>
-	''' <remarks>区切り文字からその区切り文字用の名前をつけて保存ダイアログを作成し返す</remarks>
-	Private Function _GetSaveAsDialog(ByVal pDelimiter As OutputDelimiterText.Delimiter) As SaveFileDialog
-
-		'大文字、小文字の区切り文字を取得
-		Dim mDelimiterUpperCase As String = pDelimiter.ToString.ToUpper
-		Dim mDelimiterLowerCase As String = pDelimiter.ToString.ToLower
-
-		'名前を付けて保存ダイアログを表示
-		Dim mDailog As New SaveFileDialog
-		With mDailog
-
-			'デフォルトファイル設定（対象パスフォルダ名＋.区切り文字）
-			.FileName = _FolderFileList.TargetPathFolderName & "." & mDelimiterLowerCase
-
-			'表示ファイル設定
-			.Filter = mDelimiterUpperCase & "ファイル(*." & mDelimiterLowerCase & ")|*." & mDelimiterLowerCase & "|すべてのファイル(*.*)|*.*"
-
-		End With
-
-		Return mDailog
-
-	End Function
-
-	''' <summary>文字列を指定ファイルに書き込む</summary>
-	''' <param name="pWriteText">書き込むテキスト</param>
-	''' <param name="pOutputPath">指定ファイル（出力先フルパス）</param>
-	''' <param name="pEncoding">使用する文字エンコーディング</param>
-	''' <remarks>指定されたファイルが存在しない場合はファイルを作成して書き込む
-	'''          指定されたファイルが存在する場合はファイルを上書きして書き込む</remarks>
-	Private Sub _WriteTextToOutputFile(ByVal pWriteText As String, ByVal pOutputPath As String, ByVal pEncoding As System.Text.Encoding)
-
-		Using mSW As New System.IO.StreamWriter(pOutputPath, False, pEncoding)
-
-			mSW.Write(pWriteText)
-
-		End Using
-
-	End Sub
 
 #End Region
 
@@ -1746,22 +1688,22 @@ Public Class frmResultGridView
 	Private Async Sub _RunCommandProcess()
 
         '出力形式コマンドが指定なしの時
-        If CommandLine.Instance.OutPut = CommandLine.OutPutType.None Then
+		If CommandLine.Instance.Output = CommandLine.OutputType.None Then
 
-            'フォームを透明状態から元に戻す
-            Me.Opacity = 1
+			'フォームを透明状態から元に戻す
+			Me.Opacity = 1
 
-        Else
+		Else
 
-            'Alt+Tabに表示させない
-            Call MyBase.SetShowHideAltTabWindow(AltTabType.Hide)
+			'Alt+Tabに表示させない
+			MyBase.SetShowHideAltTabWindow(AltTabType.Hide)
 
-            Select Case CommandLine.Instance.OutPut
+			Select Case CommandLine.Instance.Output
 
-                Case CommandLine.OutPutType.ClipBoard
+				Case CommandLine.OutputType.ClipBoard
 
-                    '出力用テキストクリップボードコピー
-                    Call _SaveOutPutTextFileToClipBoard(CommandLine.Instance.Extension)
+					'出力用テキストをクリップボードコピー
+					Clipboard.SetText(_GetOutputFileText(CommandLine.Instance.Extension))
 
 					'クリップボードにコピーしました通知を表示
 					Dim mFrmPopupMessage As New frmPopupMessage(_cMessage.NoticeMessageTitle, _cMessage.NoticeMessageDetail)
@@ -1775,10 +1717,15 @@ Public Class frmResultGridView
 					'  メインフォームを表示させず閉じるため
 					Me.Owner.Dispose()
 
-                Case CommandLine.OutPutType.SaveDialog
+				Case CommandLine.OutputType.SaveDialog
 
-                    '出力用テキスト保存処理
-                    Call _SaveOutPutTextFile(CommandLine.Instance.Extension)
+					'拡張子がHtmlの場合はエンコードを「UTF-8」に変更
+					'※デフォルトは「Shift-Jis」
+					Dim mSaveFileEncord As System.Text.Encoding = cEncording.ShiftJis
+					If CommandLine.Instance.Extension = CommandLine.OutputFileFormat.HTML Then mSaveFileEncord = cEncording.UTF8
+
+					'出力用テキスト保存処理
+					Call _SaveOutputFile(CommandLine.Instance.Extension, _FolderFileList.TargetPathFolderName, mSaveFileEncord)
 
 					'メインフォームのリソースを破棄する
 					'※Closeをすると無限ループしてしまうのでDisposeで対応（これでいいのか不明……）

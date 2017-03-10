@@ -35,8 +35,8 @@ Partial Class frmResultGridView
 		Me.chkFileSizeLevel = New System.Windows.Forms.CheckBox()
 		Me.cmbFileSizeLevel = New System.Windows.Forms.ComboBox()
 		Me.btnResultTextForm = New System.Windows.Forms.Button()
-		Me.btnTSV = New System.Windows.Forms.Button()
-		Me.btnCSV = New System.Windows.Forms.Button()
+		Me.btnTsvOutput = New System.Windows.Forms.Button()
+		Me.btnCsvOutput = New System.Windows.Forms.Button()
 		Me.grpName = New System.Windows.Forms.GroupBox()
 		Me.btnNameSearch = New System.Windows.Forms.Button()
 		Me.txtName = New System.Windows.Forms.TextBox()
@@ -47,6 +47,7 @@ Partial Class frmResultGridView
 		Me.rbtnFolder = New System.Windows.Forms.RadioButton()
 		Me.rbtnAll = New System.Windows.Forms.RadioButton()
 		Me.dgvFolderFileList = New System.Windows.Forms.DataGridView()
+		Me.btnHtmlOutput = New System.Windows.Forms.Button()
 		Me.grpFileSize.SuspendLayout()
 		Me.grpName.SuspendLayout()
 		Me.grpExtension.SuspendLayout()
@@ -179,23 +180,23 @@ Partial Class frmResultGridView
 		Me.btnResultTextForm.Text = "出力文字列フォーム(O)"
 		Me.btnResultTextForm.UseVisualStyleBackColor = True
 		'
-		'btnTSV
+		'btnTsvOutput
 		'
-		Me.btnTSV.Location = New System.Drawing.Point(914, 530)
-		Me.btnTSV.Name = "btnTSV"
-		Me.btnTSV.Size = New System.Drawing.Size(80, 23)
-		Me.btnTSV.TabIndex = 7
-		Me.btnTSV.Text = "TSV出力(T)"
-		Me.btnTSV.UseVisualStyleBackColor = True
+		Me.btnTsvOutput.Location = New System.Drawing.Point(914, 530)
+		Me.btnTsvOutput.Name = "btnTsvOutput"
+		Me.btnTsvOutput.Size = New System.Drawing.Size(80, 23)
+		Me.btnTsvOutput.TabIndex = 7
+		Me.btnTsvOutput.Text = "TSV出力(T)"
+		Me.btnTsvOutput.UseVisualStyleBackColor = True
 		'
-		'btnCSV
+		'btnCsvOutput
 		'
-		Me.btnCSV.Location = New System.Drawing.Point(829, 530)
-		Me.btnCSV.Name = "btnCSV"
-		Me.btnCSV.Size = New System.Drawing.Size(80, 23)
-		Me.btnCSV.TabIndex = 6
-		Me.btnCSV.Text = "CSV出力(C)"
-		Me.btnCSV.UseVisualStyleBackColor = True
+		Me.btnCsvOutput.Location = New System.Drawing.Point(829, 530)
+		Me.btnCsvOutput.Name = "btnCsvOutput"
+		Me.btnCsvOutput.Size = New System.Drawing.Size(80, 23)
+		Me.btnCsvOutput.TabIndex = 6
+		Me.btnCsvOutput.Text = "CSV出力(C)"
+		Me.btnCsvOutput.UseVisualStyleBackColor = True
 		'
 		'grpName
 		'
@@ -298,11 +299,21 @@ Partial Class frmResultGridView
 		Me.dgvFolderFileList.Size = New System.Drawing.Size(976, 429)
 		Me.dgvFolderFileList.TabIndex = 4
 		'
+		'btnHtmlOutput
+		'
+		Me.btnHtmlOutput.Location = New System.Drawing.Point(743, 530)
+		Me.btnHtmlOutput.Name = "btnHtmlOutput"
+		Me.btnHtmlOutput.Size = New System.Drawing.Size(80, 23)
+		Me.btnHtmlOutput.TabIndex = 21
+		Me.btnHtmlOutput.Text = "html出力(H)"
+		Me.btnHtmlOutput.UseVisualStyleBackColor = True
+		'
 		'frmResultGridView
 		'
 		Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
 		Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
 		Me.ClientSize = New System.Drawing.Size(1009, 562)
+		Me.Controls.Add(Me.btnHtmlOutput)
 		Me.Controls.Add(Me.lblRangeStart)
 		Me.Controls.Add(Me.txtRangeStart)
 		Me.Controls.Add(Me.txtMaxSearchCount)
@@ -314,8 +325,8 @@ Partial Class frmResultGridView
 		Me.Controls.Add(Me.btnPrevPage)
 		Me.Controls.Add(Me.grpFileSize)
 		Me.Controls.Add(Me.btnResultTextForm)
-		Me.Controls.Add(Me.btnTSV)
-		Me.Controls.Add(Me.btnCSV)
+		Me.Controls.Add(Me.btnTsvOutput)
+		Me.Controls.Add(Me.btnCsvOutput)
 		Me.Controls.Add(Me.grpName)
 		Me.Controls.Add(Me.grpExtension)
 		Me.Controls.Add(Me.grpDisplayTarget)
@@ -337,17 +348,17 @@ Partial Class frmResultGridView
 		Me.PerformLayout()
 
 	End Sub
-    Friend WithEvents dgvFolderFileList As System.Windows.Forms.DataGridView
-    Friend WithEvents grpDisplayTarget As System.Windows.Forms.GroupBox
-    Friend WithEvents rbtnFile As System.Windows.Forms.RadioButton
-    Friend WithEvents rbtnFolder As System.Windows.Forms.RadioButton
-    Friend WithEvents rbtnAll As System.Windows.Forms.RadioButton
-    Friend WithEvents grpExtension As System.Windows.Forms.GroupBox
-    Friend WithEvents cmbExtension As System.Windows.Forms.ComboBox
-    Friend WithEvents grpName As System.Windows.Forms.GroupBox
-    Friend WithEvents txtName As System.Windows.Forms.TextBox
-    Friend WithEvents btnCSV As System.Windows.Forms.Button
-    Friend WithEvents btnTSV As System.Windows.Forms.Button
+	Friend WithEvents dgvFolderFileList As System.Windows.Forms.DataGridView
+	Friend WithEvents grpDisplayTarget As System.Windows.Forms.GroupBox
+	Friend WithEvents rbtnFile As System.Windows.Forms.RadioButton
+	Friend WithEvents rbtnFolder As System.Windows.Forms.RadioButton
+	Friend WithEvents rbtnAll As System.Windows.Forms.RadioButton
+	Friend WithEvents grpExtension As System.Windows.Forms.GroupBox
+	Friend WithEvents cmbExtension As System.Windows.Forms.ComboBox
+	Friend WithEvents grpName As System.Windows.Forms.GroupBox
+	Friend WithEvents txtName As System.Windows.Forms.TextBox
+	Friend WithEvents btnCsvOutput As System.Windows.Forms.Button
+	Friend WithEvents btnTsvOutput As System.Windows.Forms.Button
     Friend WithEvents btnNameSearch As System.Windows.Forms.Button
     Friend WithEvents btnResultTextForm As Button
     Friend WithEvents grpFileSize As GroupBox
@@ -361,5 +372,6 @@ Partial Class frmResultGridView
     Friend WithEvents lblRangeEnd As System.Windows.Forms.Label
     Friend WithEvents txtMaxSearchCount As System.Windows.Forms.TextBox
     Friend WithEvents lblRangeStart As System.Windows.Forms.Label
-    Friend WithEvents txtRangeStart As System.Windows.Forms.TextBox
+	Friend WithEvents txtRangeStart As System.Windows.Forms.TextBox
+	Friend WithEvents btnHtmlOutput As System.Windows.Forms.Button
 End Class

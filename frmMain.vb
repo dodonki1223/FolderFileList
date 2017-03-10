@@ -648,10 +648,10 @@ Public Class frmMain
 
 	End Function
 
-	''' <summary>フォルダファイルリスト作成中フォームへ進捗状況を表示</summary>
-	''' <param name="pProgress">フォルダファイルリスト進捗状況報告用</param>
-	''' <remarks></remarks>
-	Public Sub ShowFolderFileListProgress(ByVal pProgress As FolderFileListProgress)
+    ''' <summary>フォルダファイルリスト作成中フォームへ進捗状況を表示</summary>
+    ''' <param name="pProgress">フォルダファイルリスト進捗状況報告用</param>
+    ''' <remarks></remarks>
+    Public Sub ShowFolderFileListProgress(ByVal pProgress As FolderFileListProgress)
 
 		'フォルダファイルリスト作成中ラベルが「対象フォルダ内のフォルダ・ファイル数を計算しています」の時
 		If frmWait.Instance.lblMaking.Text = frmWait._cMessage.Calculating Then
@@ -661,16 +661,16 @@ Public Class frmMain
 
 		End If
 
-		'フォルダファイルリスト作成中フォームのプログレスバーに進捗率をセット
-		frmWait.Instance.tspbProgressRate.Value = pProgress.Percent
+        'フォルダファイルリスト作成中フォームのプログレスバーに進捗率をセット
+        frmWait.Instance.tspbProgressRate.Value = pProgress.Percent
 
-		'フォルダファイルリスト作成中フォームのステータスを表示するラベルに進捗率をセット
-		frmWait.Instance.tsslStatus.Text = pProgress.Percent & "％完了"
+        'フォルダファイルリスト作成中フォームのステータスを表示するラベルに進捗率をセット
+        frmWait.Instance.tsslStatus.Text = pProgress.Percent & "％完了"
 
-		'処理フォルダファイルをセット
-		frmWait.Instance.tsslProcessingFolderFile.Text = pProgress.ProcessingFolderFile
+        '処理フォルダファイルをセット
+        frmWait.Instance.tsslProcessingFolderFile.Text = pProgress.ProcessingFolderFile
 
-	End Sub
+    End Sub
 
 #End Region
 
@@ -686,12 +686,12 @@ Public Class frmMain
 		'表示フォームを画面に適用
 		Select Case Settings.Instance.TargetForm
 
-			Case Settings.FormType.Text
+			Case CommandLine.FormType.Text
 
 				rbtnResultText.Checked = True
 				rbtnResultGridView.Checked = False
 
-			Case Settings.FormType.List
+			Case CommandLine.FormType.List
 
 				rbtnResultText.Checked = False
 				rbtnResultGridView.Checked = True
@@ -712,11 +712,11 @@ Public Class frmMain
 
 			Case rbtnResultText.Checked = True
 
-				Settings.Instance.TargetForm = Settings.FormType.Text
+				Settings.Instance.TargetForm = CommandLine.FormType.Text
 
 			Case rbtnResultGridView.Checked = True
 
-				Settings.Instance.TargetForm = Settings.FormType.List
+				Settings.Instance.TargetForm = CommandLine.FormType.List
 
 		End Select
 
@@ -747,7 +747,7 @@ Public Class frmMain
 	Private Sub _RunCommandProcess()
 
 		'出力形式が指定なし以外の時
-		If CommandLine.Instance.OutPut <> CommandLine.OutPutType.None Then
+		If CommandLine.Instance.Output <> CommandLine.OutputType.None Then
 
 			'ウインドウをAlt+Tabに表示させない
 			MyBase.SetShowHideAltTabWindow(AltTabType.Hide)
@@ -779,12 +779,12 @@ Public Class frmMain
 		'表示フォームを画面に適用
 		Select Case CommandLine.Instance.TargetForm
 
-			Case Settings.FormType.Text
+			Case CommandLine.FormType.Text
 
 				rbtnResultText.Checked = True
 				rbtnResultGridView.Checked = False
 
-			Case Settings.FormType.List
+			Case CommandLine.FormType.List
 
 				rbtnResultText.Checked = False
 				rbtnResultGridView.Checked = True

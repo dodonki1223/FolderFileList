@@ -172,9 +172,10 @@ Public Class FolderFileList
 		End Function
 
 		''' <summary>ファイルサイズレベルリストを取得</summary>
+		''' <param name="pInitialString">リスト初期表示文字列</param>
 		''' <returns>ファイルサイズレベルのリスト</returns>
 		''' <remarks></remarks>
-		Public Shared Function LevelList() As DataTable
+		Public Shared Function LevelList(Optional ByVal pInitialString As String = "") As DataTable
 
 			Dim mLevelList As New DataTable()
 
@@ -186,7 +187,7 @@ Public Class FolderFileList
 			Dim mNoneRow As DataRow = mLevelList.NewRow
 
 			mNoneRow(LevelListColum.ID) = 0
-			mNoneRow(LevelListColum.NAME) = String.Empty
+			mNoneRow(LevelListColum.NAME) = pInitialString
 
 			mLevelList.Rows.Add(mNoneRow)
 
@@ -304,6 +305,46 @@ Public Class FolderFileList
 		''' <summary>表示文字列</summary>
 		''' <remarks>出力するときの文字列</remarks>
 		DispString
+
+	End Enum
+
+	''' <summary>フォルダファイルリストデータカラム（日本語名）</summary>
+	''' <remarks></remarks>
+	Public Enum FolderFileListJapaneseColumn
+
+		NO
+
+		ﾌｧｲﾙ名
+
+		更新日時
+
+		ﾌｧｲﾙｼｽﾃﾑﾀｲﾌﾟ値
+
+		ﾌｧｲﾙｼｽﾃﾑﾀｲﾌﾟ
+
+		拡張子
+
+		ﾌｧｲﾙｻｲｽﾞ単位無し
+
+		ﾌｧｲﾙｻｲｽﾞ
+
+		ﾌｧｲﾙｻｲｽﾞﾚﾍﾞﾙ値
+
+		ﾌｧｲﾙｻｲｽﾞﾚﾍﾞﾙ
+
+		ﾃﾞｨﾚｸﾄﾘﾚﾍﾞﾙ
+
+		親ﾌｫﾙﾀﾞ
+
+		親ﾌｫﾙﾀﾞﾌﾙﾊﾟｽ
+
+		対象ﾌｫﾙﾀﾞ以下
+
+		ﾌﾙﾊﾟｽ
+
+		最後のﾌｧｲﾙか
+
+		表示文字列
 
 	End Enum
 
@@ -491,7 +532,7 @@ Public Class FolderFileList
 
 	''' <summary>出力用文字列プロパティ</summary>
 	''' <remarks></remarks>
-	Public ReadOnly Property OutPutText As String
+	Public ReadOnly Property OutputText As String
 
 		Get
 
@@ -504,41 +545,30 @@ Public Class FolderFileList
 							   )
 
 			'出力用文字列を結合していく
-			Dim mOutPutText As New System.Text.StringBuilder
+			Dim mOutputText As New System.Text.StringBuilder
 			For Each FolderFileListRow In mQuery
 
-				mOutPutText.AppendLine(FolderFileListRow.DispString)
+				mOutputText.AppendLine(FolderFileListRow.DispString)
 
 			Next
 
-			Return mOutPutText.ToString
+			Return mOutputText.ToString
 
 		End Get
 
 	End Property
 
-    ''' <summary>拡張子リストプロパティ</summary>
-    ''' <remarks>対象となるフォルダパスで取得されたファイル群から
-    '''          作成した拡張子リストを返す                      </remarks>
-    Public ReadOnly Property ExtensionList As ArrayList
+	''' <summary>拡張子リストプロパティ</summary>
+	''' <param name="pInitialString">リスト初期表示文字列</param>
+	''' <remarks>対象となるフォルダパスで取得されたファイル群から
+	'''          作成した拡張子リストを返す                      </remarks>
+	Public ReadOnly Property ExtensionList(Optional ByVal pInitialString As String = "") As ArrayList
 
-        Get
+		Get
 
-            Return _GetExtensionList(_FolderFileList)
+			Return _GetExtensionList(_FolderFileList,pInitialString)
 
-        End Get
-
-    End Property
-
-	''' <summary>処理進捗プロパティ</summary>
-	''' <remarks></remarks>
-	Public WriteOnly Property ProcessProgress As IProgress(Of FolderFileListProgress)
-
-		Set(value As IProgress(Of FolderFileListProgress))
-
-			_ProcessProgresss = value
-
-		End Set
+		End Get
 
 	End Property
 
@@ -555,13 +585,25 @@ Public Class FolderFileList
 
 	End Property
 
+    ''' <summary>処理進捗プロパティ</summary>
+	''' <remarks></remarks>
+    Public WriteOnly Property ProcessProgress As IProgress(Of FolderFileListProgress)
+
+        Set(value As IProgress(Of FolderFileListProgress))
+
+			_ProcessProgresss = value
+
+        End Set
+
+	End Property
+
 #End Region
 
 #Region "コンストラクタ"
 
-	''' <summary>コンストラクタ</summary>
-	''' <remarks>引数無しは外部に公開しない</remarks>
-	Private Sub New()
+    ''' <summary>コンストラクタ</summary>
+    ''' <remarks>引数無しは外部に公開しない</remarks>
+    Private Sub New()
 
 	End Sub
 
@@ -570,13 +612,13 @@ Public Class FolderFileList
 	''' <remarks>引数付きのコンストラクタのみを公開</remarks>
 	Public Sub New(ByVal pPath As String)
 
-		'対象パスをセット
-		_TargetPath = pPath
+        '対象パスをセット
+        _TargetPath = pPath
 
-		'フォルダファイルリストのDataTableのカラムを作成
-		_FolderFileList = _CreateFolderFileListColumns()
+        'フォルダファイルリストのDataTableのカラムを作成
+        _FolderFileList = _CreateFolderFileListColumns()
 
-	End Sub
+    End Sub
 
 #End Region
 
@@ -660,12 +702,12 @@ Public Class FolderFileList
 
 #Region "ディレクトリのレベルを取得"
 
-	''' <summary>ディレクトリのレベルを取得</summary>
-	''' <param name="pStartingPointPath">起点となるパス</param>
-	''' <param name="pNowPath">調べたいパス</param>
-	''' <returns>パスの階層レベル</returns>
-	''' <remarks>起点となるパスからみて調べたいパスの階層レベルを返す</remarks>
-	Private Function _GetDirectoryLevel(ByVal pStartingPointPath As String, ByVal pNowPath As String) As Integer
+    ''' <summary>ディレクトリのレベルを取得</summary>
+    ''' <param name="pStartingPointPath">起点となるパス</param>
+    ''' <param name="pNowPath">調べたいパス</param>
+    ''' <returns>パスの階層レベル</returns>
+    ''' <remarks>起点となるパスからみて調べたいパスの階層レベルを返す</remarks>
+	Public Function _GetDirectoryLevel(ByVal pStartingPointPath As String, ByVal pNowPath As String) As Integer
 
 		Return pNowPath.Split("\").Length - pStartingPointPath.Split("\").Length
 
@@ -788,14 +830,14 @@ Public Class FolderFileList
 
 #Region "フォルダファイル情報をフォルダファイルリストへセット"
 
-	''' <summary>フォルダファイル情報をフォルダファイルリストへセット</summary>
-	''' <param name="pFolderFile">フォルダファイル情報</param>
-	''' <param name="pFolderFileList">フォルダファイルリスト</param>
-	''' <param name="pDirectoryLevel">ディレクトリレベル</param>
-	''' <param name="pFolderFileType">フォルダファイルタイプ</param>
-	''' <param name="pFilesCount">ファイル数</param>
-	''' <remarks>対象のフォルダファイル情報をフォルダファイルリストへセットする</remarks>
-	Private Sub _AddFolderFileDataToList(ByVal pFolderFile() As FileSystemInfo, ByVal pFolderFileList As DataTable, ByVal pDirectoryLevel As Integer _
+    ''' <summary>フォルダファイル情報をフォルダファイルリストへセット</summary>
+    ''' <param name="pFolderFile">フォルダファイル情報</param>
+    ''' <param name="pFolderFileList">フォルダファイルリスト</param>
+    ''' <param name="pDirectoryLevel">ディレクトリレベル</param>
+    ''' <param name="pFolderFileType">フォルダファイルタイプ</param>
+    ''' <param name="pFilesCount">ファイル数</param>
+    ''' <remarks>対象のフォルダファイル情報をフォルダファイルリストへセットする</remarks>
+    Private Sub _AddFolderFileDataToList(ByVal pFolderFile() As FileSystemInfo, ByVal pFolderFileList As DataTable, ByVal pDirectoryLevel As Integer _
 									   , ByVal pFolderFileType As FileSystemType, Optional pFilesCount As Integer = 0)
 
 		For mFolderFileCounter As Integer = 0 To pFolderFile.GetUpperBound(0)
@@ -904,14 +946,14 @@ Public Class FolderFileList
 		mAddDataRow(FolderFileListColumn.FullPath) = mFolderFile.FullName
 		mAddDataRow(FolderFileListColumn.IsLastFileInFolder) = pIsLastFileInFolder
 
-		'行データをDataTableにセット
-		pFolderFileList.Rows.Add(mAddDataRow)
+        '行データをDataTableにセット
+        pFolderFileList.Rows.Add(mAddDataRow)
 
-		'フォルダファイルリスト作業進捗報告
-		'※処理進捗プロパティをセットしている時のみ報告を行う
-		Call _ReportProcessProgress(pTargetPath)
+        'フォルダファイルリスト作業進捗報告
+        '※処理進捗プロパティをセットしている時のみ報告を行う
+        Call _ReportProcessProgress(pTargetPath)
 
-	End Sub
+    End Sub
 
 #End Region
 
@@ -1001,22 +1043,24 @@ Public Class FolderFileList
 #Region "拡張子リストを取得"
 
 	''' <summary>拡張子リストを取得</summary>
-	''' <param name="pFolderFileList"></param>
+	''' <param name="pFolderFileList">フォルダファイルリスト</param>
+	''' <param name="pInitialString">リスト初期表示文字列</param>
 	''' <returns>拡張子リスト</returns>
 	''' <remarks>引数で渡されたリストの拡張子リストを返します</remarks>
-	Private Function _GetExtensionList(ByVal pFolderFileList As DataTable) As ArrayList
+	Private Function _GetExtensionList(ByVal pFolderFileList As DataTable, Optional ByVal pInitialString As String = "") As ArrayList
 
-		'初期値のリスト（空文字）を追加
+		'初期値のリスト（初期表示文字列）を追加
 		Dim mExtensioinListArray As New ArrayList
-		mExtensioinListArray.Add(String.Empty)
+		mExtensioinListArray.Add(pInitialString)
 
-		'拡張子項目でグループ化（ファイル項目のみを抽出）し、空文字を除くクエリーを作成
+		'拡張子項目でグループ化（ファイル項目のみを抽出）し、初期表示文字列と空文字を除くクエリーを作成
 		'※拡張子はすべて小文字に変換する（大文字と小文字違いの拡張子をリストに表示させないため）
 		Dim mQuery = From Extensions In pFolderFileList
 					 Order By Extensions(FolderFileListColumn.Extension) Ascending
 					 Where Extensions(FolderFileListColumn.FileSystemType.ToString) = FileSystemType.File
 					 Group By Extension = Extensions(FolderFileListColumn.Extension).ToString.ToLower()
 					 Into Group
+					 Where Extension <> pInitialString
 					 Where Extension <> String.Empty
 
 
@@ -1197,23 +1241,23 @@ Public Class FolderFileList
 
 #Region "フォルダファイルリスト進捗率報告"
 
-	''' <summary>フォルダファイルリスト進捗報告</summary>
-	''' <param name="pPath">処理フォルダファイル</param>
-	''' <remarks></remarks>
-	Private Sub _ReportProcessProgress(ByVal pPath As String)
+    ''' <summary>フォルダファイルリスト進捗報告</summary>
+    ''' <param name="pPath">処理フォルダファイル</param>
+    ''' <remarks></remarks>
+    Private Sub _ReportProcessProgress(ByVal pPath As String)
 
-		'フォルダファイルリストの進捗状況を報告する変数がNothingで無かった時
-		If Not _ProcessProgresss Is Nothing Then
+        'フォルダファイルリストの進捗状況を報告する変数がNothingで無かった時
+        If Not _ProcessProgresss Is Nothing Then
 
-			'現在の処理進捗率を計算
-			Dim mProcessPercent As Integer = (_FolderFileList.Rows.Count / _FolderFileListCount) * 100
+            '現在の処理進捗率を計算
+            Dim mProcessPercent As Integer = (_FolderFileList.Rows.Count / _FolderFileListCount) * 100
 
-			'進捗率を報告
-			_ProcessProgresss.Report(New FolderFileListProgress(mProcessPercent, pPath))
+            '進捗率を報告
+            _ProcessProgresss.Report(New FolderFileListProgress(mProcessPercent, pPath))
 
-		End If
+        End If
 
-	End Sub
+    End Sub
 
 #End Region
 

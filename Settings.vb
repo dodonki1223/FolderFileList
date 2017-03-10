@@ -22,7 +22,7 @@ Public Class Settings
 
 	''' <summary>フォームの種類</summary>
 	''' <remarks></remarks>
-	Private _TargetForm As FormType
+	Private _TargetForm As CommandLine.FormType
 
 	''' <summary>１ページ内表示最大件数（リスト表示）</summary>
 	''' <remarks></remarks>
@@ -30,29 +30,11 @@ Public Class Settings
 
 #End Region
 
-#Region "列挙体"
-
-	''' <summary>フォームの種類</summary>
-	''' <remarks></remarks>
-	Public Enum FormType
-
-		''' <summary>フォルダファイルリストの出力文字列を表示するフォーム</summary>
-		''' <remarks></remarks>
-		Text
-
-		''' <summary>フォルダファイルリストをGridViewに表示するフォーム</summary>
-		''' <remarks></remarks>
-		List
-
-	End Enum
-
-#End Region
-
 #Region "プロパティ"
 
 	''' <summary>ターゲットフォームプロパティ</summary>
 	''' <remarks>※シリアライズを行うプロパティ</remarks>
-	Public Property TargetForm() As FormType
+	Public Property TargetForm() As CommandLine.FormType
 
 		Get
 
@@ -60,7 +42,7 @@ Public Class Settings
 
 		End Get
 
-		Set(value As FormType)
+		Set(value As CommandLine.FormType)
 
 			_TargetForm = value
 
@@ -119,7 +101,7 @@ Public Class Settings
 	Private Sub New()
 
 		'ターゲットフォームのデフォルトはフォルダファイルリストの出力文字列を表示するフォーム
-		_TargetForm = FormType.Text
+		_TargetForm = CommandLine.FormType.Text
 
 	End Sub
 

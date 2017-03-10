@@ -23,7 +23,7 @@ Public Class CommandLine
 
 		''' <summary>出力形式キーワード</summary>
 		''' <remarks></remarks>
-		Public Const OutPut As String = "/OutPut"
+		Public Const Output As String = "/Output"
 
 		''' <summary>拡張子キーワード</summary>
 		''' <remarks></remarks>
@@ -35,13 +35,35 @@ Public Class CommandLine
 
 	End Class
 
+	''' <summary>出力文字列フォーム対象拡張子リスト</summary>
+	''' <remarks></remarks>
+	Public Shared cTextFormExtensionList As New ArrayList From {OutputFileFormat.TEXT, OutputFileFormat.HTML}
+
+	''' <summary>リスト表示フォーム対象拡張子リスト</summary>
+	''' <remarks></remarks>
+	Public Shared cListFormExtensionList As New ArrayList From {OutputFileFormat.CSV, OutputFileFormat.TSV, OutputFileFormat.HTML}
+
 #End Region
 
 #Region "列挙体"
 
+	''' <summary>フォームの種類</summary>
+	''' <remarks></remarks>
+	Public Enum FormType
+
+		''' <summary>フォルダファイルリストの出力文字列を表示するフォーム</summary>
+		''' <remarks></remarks>
+		Text
+
+		''' <summary>フォルダファイルリストをGridViewに表示するフォーム</summary>
+		''' <remarks></remarks>
+		List
+
+	End Enum
+
 	''' <summary>出力形式タイプ</summary>
 	''' <remarks></remarks>
-	Public Enum OutPutType
+	Public Enum OutputType
 
 		''' <summary>指定なし</summary>
 		''' <remarks></remarks>
@@ -76,6 +98,28 @@ Public Class CommandLine
 
 	End Enum
 
+	''' <summary>ファイルの出力形式</summary>
+	''' <remarks></remarks>
+	Public Enum OutputFileFormat
+
+		''' <summary>HTML</summary>
+		''' <remarks></remarks>
+		HTML
+
+		''' <summary>TEXT</summary>
+		''' <remarks></remarks>
+		TEXT
+
+		''' <summary>CSV</summary>
+		''' <remarks></remarks>
+		CSV
+
+		''' <summary>TSV</summary>
+		''' <remarks></remarks>
+		TSV
+
+	End Enum
+
 #End Region
 
 #Region "変数"
@@ -103,15 +147,15 @@ Public Class CommandLine
 
 		''' <summary>フォームタイプコマンド</summary>
 		''' <remarks>デフォルトで出力文字列フォームをセット</remarks>
-		Private Shared _FormType As Settings.FormType = Settings.FormType.Text
+		Private Shared _FormType As FormType = FormType.Text
 
 		''' <summary>出力形式タイプコマンド</summary>
 		''' <remarks>デフォルトは指定なしをセット</remarks>
-		Private Shared _OutPut As OutPutType = OutPutType.None
+		Private Shared _Output As OutputType = OutputType.None
 
 		''' <summary>拡張子コマンド</summary>
-		''' <remarks>デフォルトはCSVをセット</remarks>
-		Private Shared _Extension As OutputDelimiterText.Delimiter = OutputDelimiterText.Delimiter.CSV
+		''' <remarks>デフォルトはTEXTをセット</remarks>
+		Private Shared _Extension As OutputFileFormat = OutputFileFormat.TEXT
 
 		''' <summary>最大表示ファイル数コマンド</summary>
 		''' <remarks>デフォルトで1000をセット</remarks>
@@ -153,9 +197,9 @@ Public Class CommandLine
 
 		''' <summary>フォームタイププロパティ</summary>
 		''' <remarks></remarks>
-		Public Property FormType As Settings.FormType
+		Public Property FormType As CommandLine.FormType
 
-			Set(value As Settings.FormType)
+			Set(value As CommandLine.FormType)
 
 				_FormType = value
 
@@ -170,16 +214,16 @@ Public Class CommandLine
 
 		''' <summary>出力形式プロパティ</summary>
 		''' <remarks></remarks>
-		Public Property OutPut As OutPutType
+		Public Property Output As OutputType
 
-			Set(value As OutPutType)
+			Set(value As OutputType)
 
-				_OutPut = value
+				_Output = value
 
 			End Set
 			Get
 
-				Return _OutPut
+				Return _Output
 
 			End Get
 
@@ -187,9 +231,9 @@ Public Class CommandLine
 
 		''' <summary>拡張子プロパティ</summary>
 		''' <remarks></remarks>
-		Public Property Extension As OutputDelimiterText.Delimiter
+		Public Property Extension As OutputFileFormat
 
-			Set(value As OutputDelimiterText.Delimiter)
+			Set(value As OutputFileFormat)
 
 				_Extension = value
 
@@ -271,15 +315,19 @@ Public Class CommandLine
 		''' <remarks></remarks>
 		Sub New(ByVal pCommandLineArg As String, ByVal pKeyWord As String)
 
-			'キーワードプロパティにセット
-			KeyWord = pCommandLineArg.Substring(0, pKeyWord.Length)
+			'       コマンドライン引数よりもキーワードの方が文字数が多い時
+			'または 'コマンドライン引数の文字数よりキーワード＋１の文字数の方が大きかったら
+			If pCommandLineArg.Length < pKeyWord.Length _
+			OrElse pCommandLineArg.Length < pKeyWord.Length + 1 Then
 
-			'コマンドライン引数の文字数よりキーワード＋１の文字数の方が大きかったら
-			If pCommandLineArg.Length < pKeyWord.Length + 1 Then
-
+				'空文字をセット
+				KeyWord = String.Empty
 				Value = String.Empty
 
 			Else
+
+				'コマンドライン引数からキーワード部分をセット
+				KeyWord = pCommandLineArg.Substring(0, pKeyWord.Length)
 
 				'KeyWord=○○○から値プロパティに「○○○」の部分をセットする
 				Value = pCommandLineArg.Substring(KeyWord.Length + 1)
@@ -336,7 +384,7 @@ Public Class CommandLine
 
 	''' <summary>フォームタイププロパティ</summary>
 	''' <remarks></remarks>
-	Public ReadOnly Property TargetForm As Settings.FormType
+	Public ReadOnly Property TargetForm As CommandLine.FormType
 
 		Get
 
@@ -348,11 +396,11 @@ Public Class CommandLine
 
 	''' <summary>出力形式プロパティ</summary>
 	''' <remarks></remarks>
-	Public ReadOnly Property OutPut As OutPutType
+	Public ReadOnly Property Output As OutputType
 
 		Get
 
-			Return _Commands.OutPut
+			Return _Commands.Output
 
 		End Get
 
@@ -360,7 +408,7 @@ Public Class CommandLine
 
 	''' <summary>拡張子プロパティ</summary>
 	''' <remarks></remarks>
-	Public ReadOnly Property Extension As OutputDelimiterText.Delimiter
+	Public ReadOnly Property Extension As OutputFileFormat
 
 		Get
 
@@ -415,7 +463,7 @@ Public Class CommandLine
 			If _SetFormTypeCommand(mCommand, _Commands) Then Continue For
 
 			'出力形式コマンドをセット、セット出来た時は次の繰り返しへ
-			If _SetOutPutCommand(mCommand, _Commands) Then Continue For
+			If _SetOutputCommand(mCommand, _Commands) Then Continue For
 
 			'拡張子コマンドをセット、セット出来た時は次の繰り返しへ
 			If _SetExtensionCommand(mCommand, _Commands) Then Continue For
@@ -424,6 +472,9 @@ Public Class CommandLine
 			If _SetPageSizeCommand(mCommand, _Commands) Then Continue For
 
 		Next
+
+		'拡張子コマンドの値が不正だった時、正しい値をセットする
+		_Commands.Extension = _GetCorrectExtension(_Commands.FormType, _Commands.Extension)
 
 	End Sub
 
@@ -465,13 +516,13 @@ Public Class CommandLine
 		'コマンドがヘルプだったらコマンドライン格納変数にセット
 		If pCommandLineArg = cKeyWords.Help Then
 
-            _Commands.HasHelpCommand = True
-            Return True
+			_Commands.HasHelpCommand = True
+			Return True
 
 		Else
 
-            _Commands.HasHelpCommand = False
-            Return False
+			_Commands.HasHelpCommand = False
+			Return False
 
 		End If
 
@@ -494,13 +545,13 @@ Public Class CommandLine
 
 			Select Case mCommand.Value.ToLower
 
-				Case Settings.FormType.Text.ToString.ToLower
+				Case FormType.Text.ToString.ToLower
 
-					pCommands.FormType = Settings.FormType.Text
+					pCommands.FormType = FormType.Text
 
-				Case Settings.FormType.List.ToString.ToLower
+				Case FormType.List.ToString.ToLower
 
-					pCommands.FormType = Settings.FormType.List
+					pCommands.FormType = FormType.List
 
 				Case Else
 
@@ -525,23 +576,23 @@ Public Class CommandLine
 	'''          False：出力形式コマンドを未セット</returns>
 	''' <remarks>対象のコマンドライン引数が出力形式コマンドの時、
 	'''          コマンドライン格納変数にセットする                   </remarks>
-	Private Function _SetOutPutCommand(ByVal pCommandLineArg As String, ByRef pCommands As CommandList) As Boolean
+	Private Function _SetOutputCommand(ByVal pCommandLineArg As String, ByRef pCommands As CommandList) As Boolean
 
 		'コマンドライン引数から拡張子コマンドと拡張子を取得
-		Dim mCommand As New Command(pCommandLineArg, cKeyWords.OutPut)
+		Dim mCommand As New Command(pCommandLineArg, cKeyWords.Output)
 
 		'対象コマンドがフォームタイプコマンドの時
-		If mCommand.KeyWord.ToLower = cKeyWords.OutPut.ToLower Then
+		If mCommand.KeyWord.ToLower = cKeyWords.Output.ToLower Then
 
 			Select Case mCommand.Value.ToLower
 
-				Case OutPutType.ClipBoard.ToString.ToLower
+				Case OutputType.ClipBoard.ToString.ToLower
 
-					pCommands.OutPut = OutPutType.ClipBoard
+					pCommands.Output = OutputType.ClipBoard
 
-				Case OutPutType.SaveDialog.ToString.ToLower
+				Case OutputType.SaveDialog.ToString.ToLower
 
-					pCommands.OutPut = OutPutType.SaveDialog
+					pCommands.Output = OutputType.SaveDialog
 
 				Case Else
 
@@ -576,13 +627,21 @@ Public Class CommandLine
 
 			Select Case mCommand.Value.ToLower
 
-				Case OutputDelimiterText.Delimiter.CSV.ToString.ToLower
+				Case OutputFileFormat.TEXT.ToString.ToLower
 
-					pCommands.Extension = OutputDelimiterText.Delimiter.CSV
+					pCommands.Extension = OutputFileFormat.TEXT
 
-				Case OutputDelimiterText.Delimiter.TSV.ToString.ToLower
+				Case OutputFileFormat.CSV.ToString.ToLower
 
-					pCommands.Extension = OutputDelimiterText.Delimiter.TSV
+					pCommands.Extension = OutputFileFormat.CSV
+
+				Case OutputFileFormat.TSV.ToString.ToLower
+
+					pCommands.Extension = OutputFileFormat.TSV
+
+				Case OutputFileFormat.HTML.ToString.ToLower
+
+					pCommands.Extension = OutputFileFormat.HTML
 
 				Case Else
 
@@ -662,6 +721,44 @@ Public Class CommandLine
 
 	End Function
 
+	''' <summary>フォームにあった正しい拡張子の値を取得</summary>
+	''' <param name="pFormType">フォームタイプ</param>
+	''' <param name="pExtension">拡張子コマンドの値</param>
+	''' <returns>フォームにあった正しい拡張子の値</returns>
+	''' <remarks></remarks>
+	Private Function _GetCorrectExtension(ByVal pFormType As FormType, ByVal pExtension As OutputFileFormat) As OutputFileFormat
+
+		Dim CorrectExtension As OutputFileFormat = pExtension
+
+		'フォームタイプごと処理を分岐
+		Select Case pFormType
+
+			Case FormType.Text
+
+				'拡張子コマンドが出力文字列フォームで使用出来る拡張子と一致しなかったら
+				If Not cTextFormExtensionList.Contains(pExtension) Then
+
+					'出力文字列フォームのデフォルトの拡張子をセット
+					CorrectExtension = OutputFileFormat.TEXT
+
+				End If
+
+			Case FormType.List
+
+				'拡張子コマンドがリスト表示フォームで使用出来る拡張子と一致しなかったら
+				If Not cListFormExtensionList.Contains(pExtension) Then
+
+					'リスト表示フォームのデフォルトの拡張子をセット
+					CorrectExtension = OutputFileFormat.CSV
+
+				End If
+
+		End Select
+
+		Return CorrectExtension
+
+	End Function
+
 #End Region
 
 #Region "外部公開メソッド"
@@ -675,27 +772,39 @@ Public Class CommandLine
 
 		With mCommnadListString
 
-			.AppendLine("ﾍﾙﾌﾟ　　　　　：/?                                          ")
-			.AppendLine("ﾌｫｰﾑﾀｲﾌﾟ　　　：/Form=(Text | List)                         ")
-			.AppendLine("　　　　　　　　※ﾃﾞﾌｫﾙﾄは「/Form=Text」                    ")
-			.AppendLine("　　　　　　　　　Text：出力文字列ﾌｫｰﾑ                      ")
-			.AppendLine("　　　　　　　　　List：ﾘｽﾄ表示ﾌｫｰﾑ                         ")
-			.AppendLine("出力形式　　　：/OutPut=(ClipBoard | SaveDialog)            ")
-			.AppendLine("　　　　　　　　　ClipBoard ：ｸﾘｯﾌﾟﾎﾞｰﾄﾞにｺﾋﾟｰ              ")
-			.AppendLine("　　　　　　　　　SaveDialog：名前をつけて保存ﾀﾞｲｱﾛｸﾞで保存 ")
-			.AppendLine("拡張子　　　　：/Extension=(csv | tsv)                      ")
-			.AppendLine("　　　　　　　　　csv：CSV形式で出力                        ")
-			.AppendLine("　　　　　　　　　tsv：TSV形式で出力                        ")
-			.AppendLine("　　　　　　　　※ﾃﾞﾌｫﾙﾄは「/Extension=csv」                ")
-			.AppendLine("　　　　　　　　　「/Form=List」の時しか効きません          ")
-			.AppendLine("最大表示ﾌｧｲﾙ数：/PageSize=数値                              ")
-			.AppendLine("　　　　　　　　※ﾃﾞﾌｫﾙﾄは「/PageSize=1000」                ")
-			.AppendLine("　　　　　　　　　数値のみ有効でそれ以外は無視されます      ")
-			.AppendLine("　　　　　　　　　「/Form=List」の時しか効きません          ")
-			.AppendLine("                                                            ")
-			.AppendLine("★使用例★                                                  ")
-			.AppendLine("　FolderFileList.exe ""ﾌｫﾙﾀﾞﾊﾟｽ"" /Form=List                ")
-			.AppendLine("　※ﾌｫﾙﾀﾞﾊﾟｽをﾘｽﾄ表示ﾌｫｰﾑで表示                             ")
+			.AppendLine("ﾍﾙﾌﾟ　　　　　：/?                                           ")
+			.AppendLine("ﾌｫｰﾑﾀｲﾌﾟ　　　：/Form=(Text | List)                          ")
+			.AppendLine("　　　　　　　　※ﾃﾞﾌｫﾙﾄは「/Form=Text」                     ")
+			.AppendLine("　　　　　　　　　Text：出力文字列ﾌｫｰﾑ                       ")
+			.AppendLine("　　　　　　　　　List：ﾘｽﾄ表示ﾌｫｰﾑ                          ")
+			.AppendLine("出力形式　　　：/Output=(ClipBoard | SaveDialog)             ")
+			.AppendLine("　　　　　　　　　ClipBoard ：ｸﾘｯﾌﾟﾎﾞｰﾄﾞにｺﾋﾟｰ               ")
+			.AppendLine("　　　　　　　　　SaveDialog：名前をつけて保存ﾀﾞｲｱﾛｸﾞで保存  ")
+			.AppendLine("拡張子　　　　：/Extension=(txt | csv | tsv | html)          ")
+			.AppendLine("　　　　　　　　　txt ：TXT形式で出力                        ")
+			.AppendLine("　　　　　　　　　csv ：CSV形式で出力                        ")
+			.AppendLine("　　　　　　　　　tsv ：TSV形式で出力                        ")
+			.AppendLine("　　　　　　　　　html：HTML形式で出力                       ")
+			.AppendLine("　　　　　　　　※ﾃﾞﾌｫﾙﾄの拡張子はﾌｫｰﾑによって異なります     ")
+			.AppendLine("　　　　　　　　  「/Extension=txt」(/Form=Text)             ")
+			.AppendLine("　　　　　　　　  「/Extension=csv」(/Form=List)             ")
+			.AppendLine("　　　　　　　　※ﾌｫｰﾑによって使用できる拡張子が違います     ")
+			.AppendLine("　　　　　　　　  txt,html(/Form=Text)                       ")
+			.AppendLine("　　　　　　　　  csv,tsv,html(/Form=List)                   ")
+			.AppendLine("　　　　　　　　※htmlは以下の設定では使用出来ません         ")
+			.AppendLine("　　　　　　　　  「/Output=ClipBoard」                      ")
+			.AppendLine("最大表示ﾌｧｲﾙ数：/PageSize=数値                               ")
+			.AppendLine("　　　　　　　　※ﾃﾞﾌｫﾙﾄは「/PageSize=1000」                 ")
+			.AppendLine("　　　　　　　　　数値のみ有効でそれ以外は無視されます       ")
+			.AppendLine("　　　　　　　　　「/Form=List」の時しか効きません           ")
+			.AppendLine("                                                             ")
+			.AppendLine("★不正なｺﾏﾝﾄﾞﾗｲﾝ引数を使用した場合★　　　　　　　　         ")
+			.AppendLine("　不正なｷｰﾜｰﾄﾞの場合は無視されます                           ")
+			.AppendLine("　不正な値の場合はﾃﾞﾌｫﾙﾄ設定で実行されます                   ")
+			.AppendLine("                                                             ")
+			.AppendLine("★使用例★                                                   ")
+			.AppendLine("　FolderFileList.exe ""ﾌｫﾙﾀﾞﾊﾟｽ"" /Form=List                 ")
+			.AppendLine("　※ﾌｫﾙﾀﾞﾊﾟｽをﾘｽﾄ表示ﾌｫｰﾑで表示                              ")
 
 		End With
 
@@ -740,7 +849,7 @@ Public Class CommandLine
 			.AppendLine("→" & Instance.TargetForm.ToString & " ")
 			.AppendLine("                                       ")
 			.AppendLine("④出力形式                             ")
-			.AppendLine("→" & Instance.OutPut.ToString & "     ")
+			.AppendLine("→" & Instance.Output.ToString & "     ")
 			.AppendLine("                                       ")
 			.AppendLine("⑤拡張子                               ")
 			.AppendLine("→" & Instance.Extension.ToString & "  ")
@@ -773,7 +882,7 @@ Public Class CommandLine
 			.AppendLine("③フォームタイプ                       ")
 			.AppendLine("→" & Instance.TargetForm.ToString & " ")
 			.AppendLine("④出力形式                             ")
-			.AppendLine("→" & Instance.OutPut.ToString & "     ")
+			.AppendLine("→" & Instance.Output.ToString & "     ")
 			.AppendLine("⑤拡張子                               ")
 			.AppendLine("→" & Instance.Extension.ToString & "  ")
 			.AppendLine("⑥最大表示ファイル数                   ")
