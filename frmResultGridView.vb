@@ -100,17 +100,21 @@ Public Class frmResultGridView
 
 	End Class
 
-	''' <summary>ヘッダーセルカラー</summary>
+	''' <summary>データグリッドビューで使用するカラー</summary>
 	''' <remarks></remarks>
-	Private Class _cHeaderCellColor
+	Private Class _cGridViewColor
 
-		''' <summary>昇順カラー</summary>
+		''' <summary>実行出来るカラムのフォントカラー</summary>
+		''' <remarks>Blue</remarks>
+		Public Shared ReadOnly RunColumnFont As System.Drawing.Color = Color.Blue
+
+		''' <summary>ヘッダーセル昇順カラー</summary>
 		''' <remarks>HotPink</remarks>
-		Public Shared ReadOnly Asceding As System.Drawing.Color = Color.HotPink
+		Public Shared ReadOnly HeaderAsceding As System.Drawing.Color = Color.HotPink
 
-		''' <summary>降順カラー</summary>
+		''' <summary>ヘッダーセル降順カラー</summary>
 		''' <remarks>LightSkyBlue</remarks>
-		Public Shared ReadOnly Desceding As System.Drawing.Color = Color.LightSkyBlue
+		Public Shared ReadOnly HeaderDesceding As System.Drawing.Color = Color.LightSkyBlue
 
 	End Class
 
@@ -1066,6 +1070,14 @@ Public Class frmResultGridView
 		DebugMode.DisplayAllColumnForFrmResultGridView(CType(Me, frmResultGridView))
 
 		'----------------------------------------
+		' カラムのフォントカラー設定
+		'----------------------------------------
+		dgvFolderFileList.Columns(FolderFileListColumn.Name).DefaultCellStyle.ForeColor = _cGridViewColor.RunColumnFont
+		dgvFolderFileList.Columns(FolderFileListColumn.ParentFolder).DefaultCellStyle.ForeColor = _cGridViewColor.RunColumnFont
+		dgvFolderFileList.Columns(FolderFileListColumn.UnderTargetFolder).DefaultCellStyle.ForeColor = _cGridViewColor.RunColumnFont
+		dgvFolderFileList.Columns(FolderFileListColumn.FullPath).DefaultCellStyle.ForeColor = _cGridViewColor.RunColumnFont
+
+		'----------------------------------------
 		' GridViewプロパティ設定
 		'----------------------------------------
 		'読み込み専用（編集不可）に設定
@@ -1295,11 +1307,11 @@ Public Class frmResultGridView
 
 			Case SortOrder.Ascending
 
-				pHeaderCell.Style.BackColor = _cHeaderCellColor.Asceding
+				pHeaderCell.Style.BackColor = _cGridViewColor.HeaderAsceding
 
 			Case SortOrder.Descending
 
-				pHeaderCell.Style.BackColor = _cHeaderCellColor.Desceding
+				pHeaderCell.Style.BackColor = _cGridViewColor.HeaderDesceding
 
 		End Select
 
