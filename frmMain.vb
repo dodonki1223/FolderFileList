@@ -686,12 +686,12 @@ Public Class frmMain
 		'表示フォームを画面に適用
 		Select Case Settings.Instance.TargetForm
 
-			Case Settings.FormType.Text
+			Case CommandLine.FormType.Text
 
 				rbtnResultText.Checked = True
 				rbtnResultGridView.Checked = False
 
-			Case Settings.FormType.List
+			Case CommandLine.FormType.List
 
 				rbtnResultText.Checked = False
 				rbtnResultGridView.Checked = True
@@ -712,11 +712,11 @@ Public Class frmMain
 
 			Case rbtnResultText.Checked = True
 
-				Settings.Instance.TargetForm = Settings.FormType.Text
+				Settings.Instance.TargetForm = CommandLine.FormType.Text
 
 			Case rbtnResultGridView.Checked = True
 
-				Settings.Instance.TargetForm = Settings.FormType.List
+				Settings.Instance.TargetForm = CommandLine.FormType.List
 
 		End Select
 
@@ -747,7 +747,7 @@ Public Class frmMain
 	Private Sub _RunCommandProcess()
 
 		'出力形式が指定なし以外の時
-		If CommandLine.Instance.OutPut <> CommandLine.OutPutType.None Then
+		If CommandLine.Instance.Output <> CommandLine.OutputType.None Then
 
 			'ウインドウをAlt+Tabに表示させない
 			MyBase.SetShowHideAltTabWindow(AltTabType.Hide)
@@ -779,12 +779,12 @@ Public Class frmMain
 		'表示フォームを画面に適用
 		Select Case CommandLine.Instance.TargetForm
 
-			Case Settings.FormType.Text
+			Case CommandLine.FormType.Text
 
 				rbtnResultText.Checked = True
 				rbtnResultGridView.Checked = False
 
-			Case Settings.FormType.List
+			Case CommandLine.FormType.List
 
 				rbtnResultText.Checked = False
 				rbtnResultGridView.Checked = True

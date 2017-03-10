@@ -1,6 +1,7 @@
 ﻿Option Explicit On
 
 Imports FolderFileList.FolderFileList
+Imports FolderFileList.CommandLine
 
 ''' <summary>フォルダファイルリストの出力文字列を表示するフォームを提供する</summary>
 ''' <remarks>フォームの共通処理のInterface（IFormCommonProcess）を実装する</remarks>
@@ -9,9 +10,13 @@ Public Class frmResultText
 
 #Region "定数"
 
-	''' <summary>出力ファイル形式</summary>
+	''' <summary>Text出力ファイル形式</summary>
 	''' <remarks></remarks>
-	Private Const _cOutputFileFormat As String = "TXT"
+	Private Const _cOutputTextFileFormat As String = "TXT"
+
+	''' <summary>Html出力ファイル形式</summary>
+	''' <remarks></remarks>
+	Private Const _cOutputHtmlFileFormat As String = "HTML"
 
 	''' <summary>出力文字列フォームで使用するメッセージを提供する</summary>
 	''' <remarks></remarks>
@@ -193,9 +198,13 @@ Public Class frmResultText
 
 					btnResultGridView.PerformClick()
 
-				Case "T" 'Shift+T：「出力」ボタンをクリック
+				Case "H" 'Shift+H：「html出力」ボタンをクリック
 
-					btnOutput.PerformClick()
+					btnHtmlOutput.PerformClick()
+
+				Case "T" 'Shift+T：「Text出力」ボタンをクリック
+
+					btnTextOutput.PerformClick()
 
 			End Select
 
@@ -218,9 +227,9 @@ Public Class frmResultText
 		'※インスタンスがあるってことはメインフォームの閉じる処理でないってこと
 		If frmResultGridView.HasInstance Then
 
-            '設定ファイルへ書き込み処理
-            Settings.Instance.TargetForm = Settings.FormType.Text
-            Settings.SaveToXmlFile()
+			'設定ファイルへ書き込み処理
+			Settings.Instance.TargetForm = CommandLine.FormType.Text
+			Settings.SaveToXmlFile()
 
 			'メインフォームに設定ファイルの内容を適用する
 			DirectCast(Me.Owner, frmMain).SetXmlFileSettingToScreen()
@@ -253,24 +262,24 @@ Public Class frmResultText
 
 #Region "ボタン"
 
-	''' <summary>出力ボタンクリックイベント</summary>
-	''' <param name="sender">出力ボタン</param>
+	''' <summary>Text出力ボタンクリックイベント</summary>
+	''' <param name="sender">Text出力ボタン</param>
 	''' <param name="e">Clickイベント</param>
 	''' <remarks></remarks>
-	Private Async Sub btnOutput_Click(sender As Object, e As EventArgs) Handles btnOutput.Click
+	Private Async Sub btnTextOutput_Click(sender As Object, e As EventArgs) Handles btnTextOutput.Click
 
 		'メッセージボックスから押されたボタンにより処理を分岐
-		Select Case _ShowDialogueMessage(_cOutputFileFormat)
+		Select Case MyBase.ShowDialogueMessage(_cOutputTextFileFormat)
 
 			Case Windows.Forms.DialogResult.Yes
 
 				'TXTファイル保存処理
-				Call _SaveTextFile()
+				Call _SaveOutputFile(OutputFileFormat.TEXT, _FolderFileList.TargetPathFolderName, cEncording.ShiftJis)
 
 			Case Windows.Forms.DialogResult.No
 
 				'TXTテキストクリップボードコピー
-				Clipboard.SetText(txtFolderFileList.Text)
+				Clipboard.SetText(_FolderFileList.OutputText)
 
 				'クリップボードにコピーしました通知を表示
 				Dim mFrmPopupMessage As New frmPopupMessage(_cMessage.NoticeMessageTitle, _cMessage.NoticeMessageDetail)
@@ -280,6 +289,17 @@ Public Class frmResultText
 				Await Task.Run(Sub() System.Threading.Thread.Sleep(frmPopupMessage._cMessageDisplayTotalTime))
 
 		End Select
+
+	End Sub
+
+	''' <summary>html出力ボタンクリックイベント</summary>
+	''' <param name="sender">html出力ボタン</param>
+	''' <param name="e">Clickイベント</param>
+	''' <remarks></remarks>
+	Private Sub btnHtmlOutput_Click(sender As Object, e As EventArgs) Handles btnHtmlOutput.Click
+
+		'Htmlファイル保存処理
+		Call _SaveOutputFile(OutputFileFormat.HTML, _FolderFileList.TargetPathFolderName, cEncording.UTF8)
 
 	End Sub
 
@@ -320,7 +340,7 @@ Public Class frmResultText
 		txtFolderFileList.ReadOnly = True
 
 		'出力用文字列をセットを画面にセット
-		txtFolderFileList.Text = _FolderFileList.OutPutText
+		txtFolderFileList.Text = _FolderFileList.OutputText
 
 		'フォームのタイトルにコマンドモード文言を追加
 		CommandLine.SetCommandModeToTitle(Me)
@@ -352,9 +372,9 @@ Public Class frmResultText
 
 					Select Case mTargetControl.Name
 
-						Case btnOutput.Name
+						Case btnHtmlOutput.Name, btnTextOutput.Name
 
-							'出力ボタンの場合はフォームのサイズの変更分、位置を変更する
+							'Html出力ボタン、Text出力ボタンの場合はフォームのサイズの変更分、位置を変更する
 							mTargetControl.Location = New System.Drawing.Point(mTargetControl.Location + pChangedSize)
 
 						Case btnResultGridView.Name
@@ -370,92 +390,57 @@ Public Class frmResultText
 
 	End Sub
 
-	''' <summary>Alt+Tabのウインドウ切り替え時非表示</summary>
-	''' <remarks></remarks>
-	Private Sub _SetNotShowWindowToAltTab()
-
-		'Alt+Tabに表示させない
-		Me.FormBorderStyle = Windows.Forms.FormBorderStyle.FixedToolWindow
-		Me.ShowInTaskbar = False
-
-	End Sub
-
 #End Region
 
-#Region "「出力文字列」出力用メソッド"
+#Region "「Html・TEXT」出力用メソッド"
 
-	''' <summary>TXT保存処理</summary>
+	''' <summary>出力ファイルの保存処理</summary>
+	''' <param name="pFileFormat">出力形式</param>
+	''' <param name="pDefalutFileName">保存ファイルのデフォルトのファイル名</param>
+	''' <param name="pEncording">エンコード</param>
 	''' <remarks></remarks>
-	Private Sub _SaveTextFile()
+	Private Sub _SaveOutputFile(ByVal pFileFormat As OutputFileFormat, ByVal pDefalutFileName As String, ByVal pEncording As System.Text.Encoding)
 
 		'名前を付けて保存ダイアログを表示
-		Dim mDailog As SaveFileDialog = _GetSaveAsDialog(_cOutputFileFormat)
+		Dim mDailog As SaveFileDialog = MyBase.GetSaveAsDialog(pDefalutFileName, pFileFormat.ToString.ToLower)
 
+		'名前をつけて保存ダイアログでOKが押されたら
 		If mDailog.ShowDialog = Windows.Forms.DialogResult.OK Then
 
 			'ファイルの保存処理
-			Call _WriteTextToOutputFile(txtFolderFileList.Text, mDailog.FileName, cEncording.ShiftJis)
+			MyBase.WriteTextToOutputFile(_GetOutputFileText(pFileFormat), mDailog.FileName, pEncording)
 
 		End If
 
 	End Sub
 
-	''' <summary>ユーザーに対話メッセージボックス</summary>
+	''' <summary>出力用ファイルのテキストデータを取得</summary>
 	''' <param name="pFileFormat">出力形式</param>
-	''' <returns>ダイアログボックスの戻り値</returns>
+	''' <returns>対象出力形式のテキストデータ</returns>
 	''' <remarks></remarks>
-	Private Function _ShowDialogueMessage(ByVal pFileFormat As String) As Windows.Forms.DialogResult
+	Private Function _GetOutputFileText(ByVal pFileFormat As OutputFileFormat) As String
 
-		'メッセージボックスを表示しユーザーに対話
-		Dim mMsgBoxTitle As String = pFileFormat & "出力"
-		Dim mMsgBoxText As String = "はい　：" & pFileFormat & "ファイルを保存します" & ControlChars.CrLf &
-									"いいえ：クリップボードに" & pFileFormat & "形式のテキストを保存します"
+		Dim mOutputText As String = String.Empty
 
-		Return MessageBox.Show(mMsgBoxText, mMsgBoxTitle, MessageBoxButtons.YesNo)
+		'出力形式ごと処理を分岐
+		Select Case pFileFormat
 
-	End Function
+			Case OutputFileFormat.TEXT
 
-	''' <summary>名前を付けて保存ダイアログを取得</summary>
-	''' <param name="pFileFormat ">ファイル形式</param>
-	''' <returns>ファイル形式にあった設定の名前を付けて保存ダイアログ</returns>
-	''' <remarks>区切り文字からその区切り文字用の名前をつけて保存ダイアログを作成し返す</remarks>
-	Private Function _GetSaveAsDialog(ByVal pFileFormat As String) As SaveFileDialog
+				'フォルダファイルリストの出力文字列を取得
+				mOutputText = _FolderFileList.OutputText
 
-		'大文字、小文字の区切り文字を取得
-		Dim mFileFormatUpperCase As String = pFileFormat.ToUpper
-		Dim mFileFormatLowerCase As String = pFileFormat.ToLower
+			Case OutputFileFormat.HTML
 
-		'名前を付けて保存ダイアログを表示
-		Dim mDailog As New SaveFileDialog
-		With mDailog
+				'フォルダファイルリストから出力用のHtml文字列を取得
+				Dim mOutputHtml As New OutputHtml(_FolderFileList, CommandLine.FormType.Text)
+				mOutputText = mOutputHtml.HtmlSentence
 
-			'デフォルトファイル設定（対象パスフォルダ名＋.区切り文字）
-			.FileName = _FolderFileList.TargetPathFolderName & "." & mFileFormatLowerCase
+		End Select
 
-			'表示ファイル設定
-			.Filter = mFileFormatUpperCase & "ファイル(*." & mFileFormatLowerCase & ")|*." & mFileFormatLowerCase & "|すべてのファイル(*.*)|*.*"
-
-		End With
-
-		Return mDailog
+		Return mOutputText
 
 	End Function
-
-	''' <summary>文字列を指定ファイルに書き込む</summary>
-	''' <param name="pWriteText">書き込むテキスト</param>
-	''' <param name="pOutputPath">指定ファイル（出力先フルパス）</param>
-	''' <param name="pEncoding">使用する文字エンコーディング</param>
-	''' <remarks>指定されたファイルが存在しない場合はファイルを作成して書き込む
-	'''          指定されたファイルが存在する場合はファイルを上書きして書き込む</remarks>
-	Private Sub _WriteTextToOutputFile(ByVal pWriteText As String, ByVal pOutputPath As String, ByVal pEncoding As System.Text.Encoding)
-
-		Using mSW As New System.IO.StreamWriter(pOutputPath, False, pEncoding)
-
-			mSW.Write(pWriteText)
-
-		End Using
-
-	End Sub
 
 #End Region
 
@@ -466,19 +451,19 @@ Public Class frmResultText
 	Private Async Sub _RunCommandProcess()
 
 		'出力形式コマンドが指定なしの時
-		If CommandLine.Instance.OutPut = CommandLine.OutPutType.None Then
+		If CommandLine.Instance.Output = CommandLine.OutputType.None Then
 
 			'フォームを透明状態から元に戻す
 			Me.Opacity = 1
 
 		Else
 
-			Select Case CommandLine.Instance.OutPut
+			'ウインドウをAlt+Tabに表示させない
+			MyBase.SetShowHideAltTabWindow(AltTabType.Hide)
 
-				Case CommandLine.OutPutType.ClipBoard
+			Select Case CommandLine.Instance.Output
 
-					'ウインドウをAlt+Tabに表示させない
-					MyBase.SetShowHideAltTabWindow(AltTabType.Hide)
+				Case CommandLine.OutputType.ClipBoard
 
 					'TXTテキストクリップボードコピー
 					Clipboard.SetText(txtFolderFileList.Text)
@@ -495,13 +480,15 @@ Public Class frmResultText
 					'  メインフォームを表示させず閉じるため
 					Me.Owner.Dispose()
 
-				Case CommandLine.OutPutType.SaveDialog
+				Case CommandLine.OutputType.SaveDialog
 
-					'ALT+TABに表示させない
-					Call _SetNotShowWindowToAltTab()
+					'拡張子がHtmlの場合はエンコードを「UTF-8」に変更
+					'※デフォルトは「Shift-Jis」
+					Dim mSaveFileEncord As System.Text.Encoding = cEncording.ShiftJis
+					If CommandLine.Instance.Extension = CommandLine.OutputFileFormat.HTML Then mSaveFileEncord = cEncording.UTF8
 
-					'TXTファイル保存処理
-					Call _SaveTextFile()
+					'出力用テキスト保存処理
+					Call _SaveOutputFile(CommandLine.Instance.Extension, _FolderFileList.TargetPathFolderName, mSaveFileEncord)
 
 					'メインフォームのリソースを破棄する
 					'※Closeをすると無限ループしてしまうのでDisposeで対応（これでいいのか不明……）
@@ -529,193 +516,5 @@ Public Class frmResultText
 	End Sub
 
 #End Region
-
-
-
-
-
-
-	Private Sub btnHtmlOutput_Click(sender As Object, e As EventArgs) Handles btnHtmlOutput.Click
-
-		Dim mHtmlSentence As New System.Text.StringBuilder
-
-		With mHtmlSentence
-
-			.AppendLine("<!DOCTYPE html>                                                                                                  ")
-			.AppendLine("<html lang=""ja"">                                                                                               ")
-			.AppendLine("  <head>                                                                                                         ")
-			.AppendLine("    <meta charset=""UTF-8"">                                                                                     ")
-			.AppendLine("    <style type=""text/css"">                                                                                    ")
-			.AppendLine("                                                                                                                 ")
-			.AppendLine("      /* Selectタグ設定 */                                                                                       ")
-			.AppendLine("      select {                                                                                                   ")
-			.AppendLine("        height:21px;                                                                                             ")
-			.AppendLine("      }                                                                                                          ")
-			.AppendLine("                                                                                                                 ")
-			.AppendLine("      /* Selectタグの項目の文字色は黒色 */                                                                       ")
-			.AppendLine("      option {                                                                                                   ")
-			.AppendLine("        color:#333;                                                                                              ")
-			.AppendLine("      }                                                                                                          ")
-			.AppendLine("                                                                                                                 ")
-			.AppendLine("    </style>                                                                                                     ")
-			.AppendLine("  </head>                                                                                                        ")
-			.AppendLine("  <body>                                                                                                         ")
-			.AppendLine("    <header id=""header"">                                                                                       ")
-			.AppendLine("    </header>                                                                                                    ")
-
-			.AppendLine("    <fieldset>                                                                                                   ")
-			.AppendLine("    <legend>絞り込み条件</legend>                                                                                ")
-
-			'対象ファイル指定を作成
-			.AppendLine("      <div>                                                                                                      ")
-			.AppendLine("        <input type=""radio"" name=""displayTarget"" value=""全て表示"">全て表示</input>                         ")
-			.AppendLine("        <input type=""radio"" name=""displayTarget"" value=""フォルダのみ表示"">フォルダのみ表示</input>         ")
-			.AppendLine("        <input type=""radio"" name=""displayTarget"" value=""ファイルのみ表示"">ファイルのみ表示</input>         ")
-			.AppendLine("      </div>                                                                                                     ")
-
-			'拡張子選択領域を作成
-			.AppendLine("      <div>                                                                                                      ")
-			.AppendLine("        <ul>                                                                                                      ")
-			.AppendLine("          <li>                                                                                                    ")
-			.AppendLine("            <select name=""extension"" >                                                                              ")
-
-			For Each mExtension As String In _FolderFileList.ExtensionList
-
-				If mExtension = "" Then
-
-					.AppendLine("                  <option value=""" & mExtension & """ class=""not-select"">拡張子指定（未選択）</option>                                   ")
-
-				Else
-
-					.AppendLine("                  <option value=""" & mExtension & """>" & mExtension & "</option>                                   ")
-
-				End If
-
-			Next
-
-			.AppendLine("            </select>                                                                                                ")
-			.AppendLine("          </li>                                                                                                    ")
-			.AppendLine("        </ul>                                                                                                      ")
-			.AppendLine("      </div>                                                                                                     ")
-
-			'テキスト入力ボックス
-			.AppendLine("      <div>                                                                                                      ")
-			.AppendLine("        <input type=""text"" name=""fileNameSearch"" placeholder=""名前(LIKE検索)""></input>                               ")
-			.AppendLine("      </div>                                                                                                       ")
-
-			.AppendLine("    </fieldset>                                                                                                  ")
-
-			.AppendLine("    <div>                                                                                                        ")
-			.AppendLine("      <table>                                                                                                    ")
-			.AppendLine("        <tbody>                                                                                                  ")
-			.AppendLine("          <tr>                                                                                                   ")
-
-            'ヘッダーを作成する
-			.AppendLine("            <th>" & FolderFileListColumn.Name.ToString & "</th>                                                  ")
-			.AppendLine("            <th>" & FolderFileListColumn.UpdateDate.ToString & "</th>                                            ")
-			.AppendLine("            <th>" & FolderFileListColumn.FileSystemType.ToString & "</th>                                        ")
-			.AppendLine("            <th>" & FolderFileListColumn.SizeAndUnit.ToString & "</th>                                           ")
-			.AppendLine("            <th>" & FolderFileListColumn.Extension.ToString & "</th>                                             ")
-			.AppendLine("            <th>" & FolderFileListColumn.ParentFolder.ToString & "</th>                                          ")
-
-			.AppendLine("          </tr>                                                                                                  ")
-
-			'明細を作成する
-			For Each mDr As DataRow In _FolderFileList.FolderFileList.Rows
-
-				'ファイルパスのURLを作成
-				Dim mFilePathUrl As String = _CreateWindowOpenURL(mDr(FolderFileListColumn.FullPath))
-
-				'親フォルダパスのURLを作成
-				Dim mParentFolderPathUrl As String = _CreateWindowOpenURL(mDr(FolderFileListColumn.ParentFolderFullPath))
-
-				.AppendLine("          <tr>                                                                                                   ")
-				.AppendLine("            <td><a href=""" & mFilePathUrl & """>" & mDr(FolderFileListColumn.Name) & "</a></td>                 ")
-				.AppendLine("            <td>" & mDr(FolderFileListColumn.UpdateDate) & "</td>                                                ")
-				.AppendLine("            <td>" & mDr(FolderFileListColumn.SizeAndUnit) & "</td>                                               ")
-				.AppendLine("            <td>" & mDr(FolderFileListColumn.FileSystemTypeName) & "</td>                                        ")
-				.AppendLine("            <td>" & mDr(FolderFileListColumn.Extension) & "</td>                                                 ")
-				.AppendLine("            <td><a href=""" & mParentFolderPathUrl & """>" & mDr(FolderFileListColumn.ParentFolder) & "</a></td> ")
-				.AppendLine("          </tr>                                                                                                  ")
-
-			Next
-
-			.AppendLine("        </tbody>                                                                                                 ")
-			.AppendLine("      </table>                                                                                                   ")
-			.AppendLine("    </div>                                                                                                       ")
-			.AppendLine("    <footer id=""footer"">                                                                                       ")
-			.AppendLine("      <p>copyright kobashi</p>                                                                                   ")
-			.AppendLine("    </footer>                                                                                                    ")
-			.AppendLine("    <script src=""https://code.jquery.com/jquery-2.2.0.min.js"" type=""text/javascript""></script>               ")
-			.AppendLine("    <script type=""text/javascript"">                                                                            ")
-			.AppendLine("                                                                                                                 ")
-			.AppendLine("      /**                                                                                                        ")
-			.AppendLine("       * Selectタグで最初に表示する項目の文字色を灰色表示にします                                                ")
-			.AppendLine("       */                                                                                                        ")
-			.AppendLine("      function setSelectTagColor() {                                                                             ")
-			.AppendLine("                                                                                                                 ")
-			.AppendLine("        // Selectタグで選択されている要素が「not-select」というクラスを持っていた時                              ")
-			.AppendLine("        if($('select').find('option:selected').hasClass('not-select')){                                          ")
-			.AppendLine("                                                                                                                 ")
-			.AppendLine("          // 文字色を灰色に変更                                                                                  ")
-			.AppendLine("          $('select').css({'color':'#A9A9A9'});                                                                  ")
-			.AppendLine("                                                                                                                 ")
-			.AppendLine("        }                                                                                                        ")
-			.AppendLine("                                                                                                                 ")
-			.AppendLine("        //項目が変更された時、条件によって色変更                                                                 ")
-			.AppendLine("        $('select').on('change', function(){                                                                     ")
-			.AppendLine("                                                                                                                 ")
-			.AppendLine("          // Selectタグで選択されている要素が「not-select」というクラスを持っていた時                            ")
-			.AppendLine("          if($(this).find('option:selected').hasClass('not-select')) {                                           ")
-			.AppendLine("                                                                                                                 ")
-			.AppendLine("            // 文字色を灰色に変更                                                                                ")
-			.AppendLine("            $(this).css({'color':'#ccc'});                                                                       ")
-			.AppendLine("                                                                                                                 ")
-			.AppendLine("          } else {                                                                                               ")
-			.AppendLine("                                                                                                                 ")
-			.AppendLine("            // 文字色を黒色に変更                                                                                ")
-			.AppendLine("            $(this).css({'color':'#333'});                                                                       ")
-			.AppendLine("                                                                                                                 ")
-			.AppendLine("          }                                                                                                      ")
-			.AppendLine("                                                                                                                 ")
-			.AppendLine("        });                                                                                                      ")
-			.AppendLine("                                                                                                                 ")
-			.AppendLine("      }                                                                                                          ")
-			.AppendLine("                                                                                                                 ")
-			.AppendLine("      // Selectタグの最初に表示する項目の文字色を灰色表示に変更                                                  ")
-			.AppendLine("      setSelectTagColor();                                                                                       ")
-			.AppendLine("                                                                                                                 ")
-			.AppendLine("    </script>                                                                                                    ")
-			.AppendLine("  </body>                                                                                                        ")
-			.AppendLine("</html>                                                                                                          ")
-
-		End With
-
-		'名前を付けて保存ダイアログを表示
-		Dim mDailog As SaveFileDialog = _GetSaveAsDialog("html")
-
-		If mDailog.ShowDialog = Windows.Forms.DialogResult.OK Then
-
-			'ファイルの保存処理
-			Call _WriteTextToOutputFile(mHtmlSentence.ToString, mDailog.FileName, cEncording.UTF8)
-
-		End If
-
-	End Sub
-
-	''' <summary>window.openで開く用のURLを作成</summary>
-	''' <param name="pPath">対象パス</param>
-	''' <returns>window.openで開く用のURL文字列</returns>
-	''' <remarks>※別タブでリンクを開く時のパスは以下のどちらかの
-	'''            形式でなければならない
-	'''              ①\\\\FileServer\\Folder1\\Gorira.txt
-	'''              ②file://FileServer/Folder1/Gorira.txt      </remarks>
-	Private Function _CreateWindowOpenURL(ByVal pPath As string) As String
-
-		'パス文字列から「\」マークを「\\」に変換し、
-		'パス文字列の前と後にjavascriptのwindow.open用の文字列を付加して返す
-		Return "javascript:window.open('" & "file:\\\\" & Replace(pPath, "\", "\\") & "');"
-
-	End Function
 
 End Class

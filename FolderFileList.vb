@@ -172,9 +172,10 @@ Public Class FolderFileList
 		End Function
 
 		''' <summary>ファイルサイズレベルリストを取得</summary>
+		''' <param name="pInitialString">リスト初期表示文字列</param>
 		''' <returns>ファイルサイズレベルのリスト</returns>
 		''' <remarks></remarks>
-		Public Shared Function LevelList() As DataTable
+		Public Shared Function LevelList(Optional ByVal pInitialString As String = "") As DataTable
 
 			Dim mLevelList As New DataTable()
 
@@ -186,7 +187,7 @@ Public Class FolderFileList
 			Dim mNoneRow As DataRow = mLevelList.NewRow
 
 			mNoneRow(LevelListColum.ID) = 0
-			mNoneRow(LevelListColum.NAME) = String.Empty
+			mNoneRow(LevelListColum.NAME) = pInitialString
 
 			mLevelList.Rows.Add(mNoneRow)
 
@@ -304,6 +305,46 @@ Public Class FolderFileList
 		''' <summary>表示文字列</summary>
 		''' <remarks>出力するときの文字列</remarks>
 		DispString
+
+	End Enum
+
+	''' <summary>フォルダファイルリストデータカラム（日本語名）</summary>
+	''' <remarks></remarks>
+	Public Enum FolderFileListJapaneseColumn
+
+		NO
+
+		ﾌｧｲﾙ名
+
+		更新日時
+
+		ﾌｧｲﾙｼｽﾃﾑﾀｲﾌﾟ値
+
+		ﾌｧｲﾙｼｽﾃﾑﾀｲﾌﾟ
+
+		拡張子
+
+		ﾌｧｲﾙｻｲｽﾞ単位無し
+
+		ﾌｧｲﾙｻｲｽﾞ
+
+		ﾌｧｲﾙｻｲｽﾞﾚﾍﾞﾙ値
+
+		ﾌｧｲﾙｻｲｽﾞﾚﾍﾞﾙ
+
+		ﾃﾞｨﾚｸﾄﾘﾚﾍﾞﾙ
+
+		親ﾌｫﾙﾀﾞ
+
+		親ﾌｫﾙﾀﾞﾌﾙﾊﾟｽ
+
+		対象ﾌｫﾙﾀﾞ以下
+
+		ﾌﾙﾊﾟｽ
+
+		最後のﾌｧｲﾙか
+
+		表示文字列
 
 	End Enum
 
@@ -491,7 +532,7 @@ Public Class FolderFileList
 
 	''' <summary>出力用文字列プロパティ</summary>
 	''' <remarks></remarks>
-	Public ReadOnly Property OutPutText As String
+	Public ReadOnly Property OutputText As String
 
 		Get
 
@@ -504,31 +545,32 @@ Public Class FolderFileList
 							   )
 
 			'出力用文字列を結合していく
-			Dim mOutPutText As New System.Text.StringBuilder
+			Dim mOutputText As New System.Text.StringBuilder
 			For Each FolderFileListRow In mQuery
 
-				mOutPutText.AppendLine(FolderFileListRow.DispString)
+				mOutputText.AppendLine(FolderFileListRow.DispString)
 
 			Next
 
-			Return mOutPutText.ToString
+			Return mOutputText.ToString
 
 		End Get
 
 	End Property
 
-    ''' <summary>拡張子リストプロパティ</summary>
-    ''' <remarks>対象となるフォルダパスで取得されたファイル群から
-    '''          作成した拡張子リストを返す                      </remarks>
-    Public ReadOnly Property ExtensionList As ArrayList
+	''' <summary>拡張子リストプロパティ</summary>
+	''' <param name="pInitialString">リスト初期表示文字列</param>
+	''' <remarks>対象となるフォルダパスで取得されたファイル群から
+	'''          作成した拡張子リストを返す                      </remarks>
+	Public ReadOnly Property ExtensionList(Optional ByVal pInitialString As String = "") As ArrayList
 
-        Get
+		Get
 
-            Return _GetExtensionList(_FolderFileList)
+			Return _GetExtensionList(_FolderFileList,pInitialString)
 
-        End Get
+		End Get
 
-    End Property
+	End Property
 
 	''' <summary>対象フォルダ内のサブディレクトリとファイル数プロパティ</summary>
 	''' <remarks>処理進捗を表示する場合はこのプロパティに値をセットすること</remarks>
@@ -665,7 +707,7 @@ Public Class FolderFileList
     ''' <param name="pNowPath">調べたいパス</param>
     ''' <returns>パスの階層レベル</returns>
     ''' <remarks>起点となるパスからみて調べたいパスの階層レベルを返す</remarks>
-    Private Function _GetDirectoryLevel(ByVal pStartingPointPath As String, ByVal pNowPath As String) As Integer
+	Public Function _GetDirectoryLevel(ByVal pStartingPointPath As String, ByVal pNowPath As String) As Integer
 
 		Return pNowPath.Split("\").Length - pStartingPointPath.Split("\").Length
 
@@ -1001,22 +1043,24 @@ Public Class FolderFileList
 #Region "拡張子リストを取得"
 
 	''' <summary>拡張子リストを取得</summary>
-	''' <param name="pFolderFileList"></param>
+	''' <param name="pFolderFileList">フォルダファイルリスト</param>
+	''' <param name="pInitialString">リスト初期表示文字列</param>
 	''' <returns>拡張子リスト</returns>
 	''' <remarks>引数で渡されたリストの拡張子リストを返します</remarks>
-	Private Function _GetExtensionList(ByVal pFolderFileList As DataTable) As ArrayList
+	Private Function _GetExtensionList(ByVal pFolderFileList As DataTable, Optional ByVal pInitialString As String = "") As ArrayList
 
-		'初期値のリスト（空文字）を追加
+		'初期値のリスト（初期表示文字列）を追加
 		Dim mExtensioinListArray As New ArrayList
-		mExtensioinListArray.Add(String.Empty)
+		mExtensioinListArray.Add(pInitialString)
 
-		'拡張子項目でグループ化（ファイル項目のみを抽出）し、空文字を除くクエリーを作成
+		'拡張子項目でグループ化（ファイル項目のみを抽出）し、初期表示文字列と空文字を除くクエリーを作成
 		'※拡張子はすべて小文字に変換する（大文字と小文字違いの拡張子をリストに表示させないため）
 		Dim mQuery = From Extensions In pFolderFileList
 					 Order By Extensions(FolderFileListColumn.Extension) Ascending
 					 Where Extensions(FolderFileListColumn.FileSystemType.ToString) = FileSystemType.File
 					 Group By Extension = Extensions(FolderFileListColumn.Extension).ToString.ToLower()
 					 Into Group
+					 Where Extension <> pInitialString
 					 Where Extension <> String.Empty
 
 

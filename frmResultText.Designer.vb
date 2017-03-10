@@ -23,7 +23,7 @@ Partial Class frmResultText
 	<System.Diagnostics.DebuggerStepThrough()> _
 	Private Sub InitializeComponent()
 		Me.btnResultGridView = New System.Windows.Forms.Button()
-		Me.btnOutput = New System.Windows.Forms.Button()
+		Me.btnTextOutput = New System.Windows.Forms.Button()
 		Me.txtFolderFileList = New System.Windows.Forms.TextBox()
 		Me.btnHtmlOutput = New System.Windows.Forms.Button()
 		Me.SuspendLayout()
@@ -37,14 +37,14 @@ Partial Class frmResultText
 		Me.btnResultGridView.Text = "リスト表示フォーム(O)"
 		Me.btnResultGridView.UseVisualStyleBackColor = True
 		'
-		'btnOutput
+		'btnTextOutput
 		'
-		Me.btnOutput.Location = New System.Drawing.Point(457, 520)
-		Me.btnOutput.Name = "btnOutput"
-		Me.btnOutput.Size = New System.Drawing.Size(60, 23)
-		Me.btnOutput.TabIndex = 1
-		Me.btnOutput.Text = "出力(T)"
-		Me.btnOutput.UseVisualStyleBackColor = True
+		Me.btnTextOutput.Location = New System.Drawing.Point(437, 520)
+		Me.btnTextOutput.Name = "btnTextOutput"
+		Me.btnTextOutput.Size = New System.Drawing.Size(80, 23)
+		Me.btnTextOutput.TabIndex = 1
+		Me.btnTextOutput.Text = "Text出力(T)"
+		Me.btnTextOutput.UseVisualStyleBackColor = True
 		'
 		'txtFolderFileList
 		'
@@ -61,7 +61,7 @@ Partial Class frmResultText
 		'
 		'btnHtmlOutput
 		'
-		Me.btnHtmlOutput.Location = New System.Drawing.Point(366, 520)
+		Me.btnHtmlOutput.Location = New System.Drawing.Point(351, 520)
 		Me.btnHtmlOutput.Name = "btnHtmlOutput"
 		Me.btnHtmlOutput.Size = New System.Drawing.Size(80, 23)
 		Me.btnHtmlOutput.TabIndex = 3
@@ -76,7 +76,7 @@ Partial Class frmResultText
 		Me.ClientSize = New System.Drawing.Size(534, 551)
 		Me.Controls.Add(Me.btnHtmlOutput)
 		Me.Controls.Add(Me.btnResultGridView)
-		Me.Controls.Add(Me.btnOutput)
+		Me.Controls.Add(Me.btnTextOutput)
 		Me.Controls.Add(Me.txtFolderFileList)
 		Me.MinimumSize = New System.Drawing.Size(300, 39)
 		Me.Name = "frmResultText"
@@ -86,8 +86,8 @@ Partial Class frmResultText
 		Me.PerformLayout()
 
 	End Sub
-    Friend WithEvents txtFolderFileList As System.Windows.Forms.TextBox
-	Friend WithEvents btnOutput As System.Windows.Forms.Button
+	Friend WithEvents txtFolderFileList As System.Windows.Forms.TextBox
+	Friend WithEvents btnTextOutput As System.Windows.Forms.Button
 	Friend WithEvents btnResultGridView As Button
 	Friend WithEvents btnHtmlOutput As System.Windows.Forms.Button
 End Class
