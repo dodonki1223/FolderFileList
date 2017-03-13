@@ -17,7 +17,7 @@ Public Class OutputHtml
 
 	''' <summary>フォルダファイルリストのドキュメントURL</summary>
 	''' <remarks></remarks>
-	Private Const _cFolderFileListDocumentURL As String = "https://github.com/dodonki1223/FolderFileList/tree/master/docs"
+	Public Const cFolderFileListDocumentURL As String = "https://github.com/dodonki1223/FolderFileList/tree/master/docs"
 
 	''' <summary>Selectタグ初期値</summary>
 	''' <remarks></remarks>
@@ -264,7 +264,7 @@ Public Class OutputHtml
 			.AppendLine("      <p>                                                                                                                                      ")
 
 			'フォルダ・ファイルリストのドキュメントURLを取得
-			Dim mDocumentUrl As String = _CreateWindowOpenURL(_cFolderFileListDocumentURL, LinkType.Url)
+			Dim mDocumentUrl As String = _CreateWindowOpenURL(cFolderFileListDocumentURL, LinkType.Url)
 			.AppendLine("        <a href=""" & mDocumentUrl & """>FolderFileListのドキュメントはこちら</a>                                                              ")
 
 			.AppendLine("      </p>                                                                                                                                     ")
@@ -360,8 +360,9 @@ Public Class OutputHtml
 			.AppendLine("      }                                                                                                                                        ")
 			.AppendLine("                                                                                                                                               ")
 			.AppendLine("      /* ボタン設定 */                                                                                                                         ")
-			.AppendLine("      .refineButton {                                                                                                                          ")
-			.AppendLine("        position: relative;                                                                                                                    ")
+            .AppendLine("      .refineButton {                                                                                                                          ")
+			.AppendLine("        margin-top:10px;                                                                                                                       ")
+            .AppendLine("        position: relative;                                                                                                                    ")
 			.AppendLine("        background-color: #1abc9c;                                                                                                             ")
 			.AppendLine("        border-radius: 4px;                                                                                                                    ")
 			.AppendLine("        color: #fff;                                                                                                                           ")
@@ -391,10 +392,11 @@ Public Class OutputHtml
 			.AppendLine("      }                                                                                                                                        ")
 			.AppendLine("                                                                                                                                               ")
 			.AppendLine("      /* 絞り込み条件ボックス */                                                                                                               ")
-			.AppendLine("      .refineButtonBox {                                                                                                                       ")
-			.AppendLine("        padding-top: 10px;                                                                                                                     ")
-			.AppendLine("        text-align: right;                                                                                                                     ")
-			.AppendLine("      }                                                                                                                                        ")
+            .AppendLine("      .refineButtonBox {                                                                                                                       ")
+            .AppendLine("        text-align: right;                                                                                                                     ")
+            .AppendLine("        float: left;                                                                                                                           ")
+            .AppendLine("        width: 135px;                                                                                                                          ")
+            .AppendLine("      }                                                                                                                                        ")
 			.AppendLine("                                                                                                                                               ")
 			.AppendLine("      /* 絞り込みボタン設定 */                                                                                                                 ")
 			.AppendLine("      .refineConditions .refineButton {                                                                                                        ")

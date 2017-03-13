@@ -24,6 +24,10 @@ Public Class Settings
 	''' <remarks></remarks>
 	Private _TargetForm As CommandLine.FormType
 
+	''' <summary>実行タイプ</summary>
+	''' <remarks>保存したファイルを即時で実行するかどうか</remarks>
+	Private _Execute As CommandLine.ExecuteType
+
 	''' <summary>１ページ内表示最大件数（リスト表示）</summary>
 	''' <remarks></remarks>
 	Private _MaxCountInPage As Integer
@@ -45,6 +49,25 @@ Public Class Settings
 		Set(value As CommandLine.FormType)
 
 			_TargetForm = value
+
+		End Set
+
+	End Property
+
+	''' <summary>実行タイププロパティ</summary>
+	''' <remarks>保存したファイルを即時で実行するかどうか
+	'''          ※シリアライズを行うプロパティ                          </remarks>
+	Public Property Execute() As CommandLine.ExecuteType
+
+		Get
+
+			Return _Execute
+
+		End Get
+
+		Set(value As CommandLine.ExecuteType)
+
+			_Execute = value
 
 		End Set
 

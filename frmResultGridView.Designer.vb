@@ -182,18 +182,18 @@ Partial Class frmResultGridView
 		'
 		'btnTsvOutput
 		'
-		Me.btnTsvOutput.Location = New System.Drawing.Point(914, 530)
+		Me.btnTsvOutput.Location = New System.Drawing.Point(908, 530)
 		Me.btnTsvOutput.Name = "btnTsvOutput"
-		Me.btnTsvOutput.Size = New System.Drawing.Size(80, 23)
+		Me.btnTsvOutput.Size = New System.Drawing.Size(85, 23)
 		Me.btnTsvOutput.TabIndex = 7
 		Me.btnTsvOutput.Text = "TSV出力(T)"
 		Me.btnTsvOutput.UseVisualStyleBackColor = True
 		'
 		'btnCsvOutput
 		'
-		Me.btnCsvOutput.Location = New System.Drawing.Point(829, 530)
+		Me.btnCsvOutput.Location = New System.Drawing.Point(816, 530)
 		Me.btnCsvOutput.Name = "btnCsvOutput"
-		Me.btnCsvOutput.Size = New System.Drawing.Size(80, 23)
+		Me.btnCsvOutput.Size = New System.Drawing.Size(85, 23)
 		Me.btnCsvOutput.TabIndex = 6
 		Me.btnCsvOutput.Text = "CSV出力(C)"
 		Me.btnCsvOutput.UseVisualStyleBackColor = True
@@ -301,11 +301,11 @@ Partial Class frmResultGridView
 		'
 		'btnHtmlOutput
 		'
-		Me.btnHtmlOutput.Location = New System.Drawing.Point(743, 530)
+		Me.btnHtmlOutput.Location = New System.Drawing.Point(725, 530)
 		Me.btnHtmlOutput.Name = "btnHtmlOutput"
-		Me.btnHtmlOutput.Size = New System.Drawing.Size(80, 23)
+		Me.btnHtmlOutput.Size = New System.Drawing.Size(85, 23)
 		Me.btnHtmlOutput.TabIndex = 21
-		Me.btnHtmlOutput.Text = "html出力(H)"
+		Me.btnHtmlOutput.Text = "HTML出力(H)"
 		Me.btnHtmlOutput.UseVisualStyleBackColor = True
 		'
 		'frmResultGridView

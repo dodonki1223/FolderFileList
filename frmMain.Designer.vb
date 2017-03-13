@@ -32,8 +32,12 @@ Partial Class frmMain
 		Me.grpMaxCountInPage = New System.Windows.Forms.GroupBox()
 		Me.txtMaxCountInPage = New Global.FolderFileList.NurmericTextBox()
 		Me.lblMaxCountInPage = New System.Windows.Forms.Label()
+		Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+		Me.chkRunSaveFile = New System.Windows.Forms.CheckBox()
+		Me.lblDocument = New System.Windows.Forms.Label()
 		Me.grpTargetForm.SuspendLayout()
 		Me.grpMaxCountInPage.SuspendLayout()
+		Me.GroupBox1.SuspendLayout()
 		Me.SuspendLayout()
 		'
 		'btnSetting
@@ -106,7 +110,7 @@ Partial Class frmMain
 		'
 		Me.grpMaxCountInPage.Controls.Add(Me.txtMaxCountInPage)
 		Me.grpMaxCountInPage.Controls.Add(Me.lblMaxCountInPage)
-		Me.grpMaxCountInPage.Location = New System.Drawing.Point(268, 54)
+		Me.grpMaxCountInPage.Location = New System.Drawing.Point(421, 54)
 		Me.grpMaxCountInPage.Name = "grpMaxCountInPage"
 		Me.grpMaxCountInPage.Size = New System.Drawing.Size(215, 50)
 		Me.grpMaxCountInPage.TabIndex = 5
@@ -132,12 +136,44 @@ Partial Class frmMain
 		Me.lblMaxCountInPage.TabIndex = 1
 		Me.lblMaxCountInPage.Text = "件"
 		'
+		'GroupBox1
+		'
+		Me.GroupBox1.Controls.Add(Me.chkRunSaveFile)
+		Me.GroupBox1.Location = New System.Drawing.Point(268, 54)
+		Me.GroupBox1.Name = "GroupBox1"
+		Me.GroupBox1.Size = New System.Drawing.Size(147, 50)
+		Me.GroupBox1.TabIndex = 6
+		Me.GroupBox1.TabStop = False
+		Me.GroupBox1.Text = "保存ファイル実行(Ctrl+K)"
+		'
+		'chkRunSaveFile
+		'
+		Me.chkRunSaveFile.AutoSize = True
+		Me.chkRunSaveFile.Location = New System.Drawing.Point(7, 20)
+		Me.chkRunSaveFile.Name = "chkRunSaveFile"
+		Me.chkRunSaveFile.Size = New System.Drawing.Size(130, 16)
+		Me.chkRunSaveFile.TabIndex = 0
+		Me.chkRunSaveFile.Text = "保存ファイル即時実行"
+		Me.chkRunSaveFile.UseVisualStyleBackColor = True
+		'
+		'lblDocument
+		'
+		Me.lblDocument.AutoSize = True
+		Me.lblDocument.ForeColor = System.Drawing.Color.Blue
+		Me.lblDocument.Location = New System.Drawing.Point(10, 111)
+		Me.lblDocument.Name = "lblDocument"
+		Me.lblDocument.Size = New System.Drawing.Size(213, 12)
+		Me.lblDocument.TabIndex = 7
+		Me.lblDocument.Text = "FolderFileListのドキュメントはこちら(Ctrl+D)"
+		'
 		'frmMain
 		'
 		Me.AllowDrop = True
 		Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
 		Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-		Me.ClientSize = New System.Drawing.Size(654, 112)
+		Me.ClientSize = New System.Drawing.Size(654, 132)
+		Me.Controls.Add(Me.lblDocument)
+		Me.Controls.Add(Me.GroupBox1)
 		Me.Controls.Add(Me.grpMaxCountInPage)
 		Me.Controls.Add(Me.btnSetting)
 		Me.Controls.Add(Me.grpTargetForm)
@@ -152,6 +188,8 @@ Partial Class frmMain
 		Me.grpTargetForm.PerformLayout()
 		Me.grpMaxCountInPage.ResumeLayout(False)
 		Me.grpMaxCountInPage.PerformLayout()
+		Me.GroupBox1.ResumeLayout(False)
+		Me.GroupBox1.PerformLayout()
 		Me.ResumeLayout(False)
 		Me.PerformLayout()
 
@@ -166,5 +204,8 @@ Partial Class frmMain
 	Friend WithEvents grpMaxCountInPage As System.Windows.Forms.GroupBox
 	Friend WithEvents lblMaxCountInPage As System.Windows.Forms.Label
 	Friend WithEvents txtMaxCountInPage As NurmericTextBox
+	Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
+	Friend WithEvents chkRunSaveFile As System.Windows.Forms.CheckBox
+	Friend WithEvents lblDocument As System.Windows.Forms.Label
 
 End Class

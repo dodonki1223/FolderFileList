@@ -951,7 +951,7 @@ Public Class FolderFileList
 
         'フォルダファイルリスト作業進捗報告
         '※処理進捗プロパティをセットしている時のみ報告を行う
-        Call _ReportProcessProgress(pTargetPath)
+		Call _ReportProcessProgress(mFolderFile.Name)
 
     End Sub
 

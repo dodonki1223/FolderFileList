@@ -15,7 +15,7 @@ Public Class frmMain
 	Private Shared ReadOnly _cDefaultWindowSize As New System.Drawing.Size(New System.Drawing.Point(670, 80))
 
 	''' <summary>設定ボタン押下後のウインドウサイズ</summary>
-	Private Shared ReadOnly _cOpenSettingWindowSize As New System.Drawing.Size(New System.Drawing.Point(670, 150))
+	Private Shared ReadOnly _cOpenSettingWindowSize As New System.Drawing.Size(New System.Drawing.Point(670, 170))
 
 	''' <summary>フォルダ選択画面で使用するメッセージを提供する</summary>
 	''' <remarks></remarks>
@@ -180,18 +180,28 @@ Public Class frmMain
 
 				Case "O" 'Ctrl+O：「出力文字列」を選択
 
-					'設定ボタンを押した時のウインドウサイズの時、実行
+					'設定ボタンを押した時のウインドウサイズの時、出力文字列をチェック
 					If Me.Size = _cOpenSettingWindowSize Then rbtnResultText.Checked = True
 
 				Case "L" 'Ctrl+L：「リスト表示」を選択
 
-					'設定ボタンを押した時のウインドウサイズの時、実行
+					'設定ボタンを押した時のウインドウサイズの時、リスト表示をチェック
 					If Me.Size = _cOpenSettingWindowSize Then rbtnResultGridView.Checked = True
+
+				Case "K" 'Ctrl+K：「保存ファイル即時実行」のチェック
+
+					'設定ボタンを押した時のウインドウサイズの時、保存ファイルの即時実行をチェック・アンチェック
+					If Me.Size = _cOpenSettingWindowSize Then chkRunSaveFile.Checked = Not (chkRunSaveFile.Checked)
 
 				Case "M" 'Ctrl+M：「最大表示ファイル数（リスト表示）」へフォーカスをセット
 
 					'設定ボタンを押した時のウインドウサイズの時、実行
 					If Me.Size = _cOpenSettingWindowSize Then txtMaxCountInPage.Focus()
+
+				Case "D" 'Ctrl+D：「FolderFileListのドキュメント」URLへ遷移（既定のブラウザで開く）
+
+					'設定ボタンを押した時のウインドウサイズの時、「FolderFileListのドキュメント」URLへ遷移（既定のブラウザで開く）
+					If Me.Size = _cOpenSettingWindowSize Then MyBase.RunFile(OutputHtml.cFolderFileListDocumentURL)
 
 			End Select
 
@@ -397,6 +407,21 @@ Public Class frmMain
 
 #End Region
 
+#Region "ラベル"
+
+	''' <summary>「FolderFileListのドキュメントはこちら」ラベルのClickイベント</summary>
+	''' <param name="sender">「FolderFileListのドキュメントはこちら」ラベル</param>
+	''' <param name="e">Clickイベント</param>
+	''' <remarks></remarks>
+	Private Sub lblDocument_Click(sender As Object, e As EventArgs) Handles lblDocument.Click
+
+		'FolderFileListのドキュメントURLへ遷移（既定のブラウザで開く）
+		MyBase.RunFile(OutputHtml.cFolderFileListDocumentURL)
+
+	End Sub
+
+#End Region
+
 #End Region
 
 #Region "メソッド"
@@ -436,8 +461,7 @@ Public Class frmMain
 		'設定ファイルの内容を画面に適用
 		SetXmlFileSettingToScreen()
 
-		'フォームのタイトルにデバッグモード文言を追加
-		'※デバッグモード時のみ実行される
+		'フォームのタイトルにデバッグモード文言を追加（デバッグモード時のみ実行される）
 		DebugMode.SetDebugModeTitle(Me)
 
 	End Sub
@@ -588,8 +612,7 @@ Public Class frmMain
     ''' <remarks>フォルダファイルリストを非同期で作成し、作成中の時は作成中フォームを表示する</remarks>
 	Private Async Function _CreateFolderFileList(ByVal pPath As String) As Task(Of FolderFileList)
 
-		'時間の計測開始
-		'※デバッグモード時のみ実行される
+		'時間の計測開始（デバッグモード時のみ実行される）
 		DebugMode.StartDebugWatch()
 
 		'子フォームの親フォームにメインフォームを設定
@@ -636,12 +659,10 @@ Public Class frmMain
 
 		End Try
 
-		'時間の計測終了、経過時間を表示
-		'※デバッグモード時のみ実行される
+		'時間の計測終了、経過時間を表示（デバッグモード時のみ実行される）
 		DebugMode.StopDebugWatchShowProcessingTime("ﾌｫﾙﾀﾞﾌｧｲﾙﾘｽﾄ作成時間", "フォルダファイルリストの作成時間は")
 
-		'非同期でMessenger風通知メッセージが非表示になるまで待機
-		'※デバッグモード時のみ実行される
+		'非同期でMessenger風通知メッセージが非表示になるまで待機（デバッグモード時のみ実行される）
 		Await Task.Run(Sub() DebugMode.WaitTillClosingPopupMessage())
 
 		Return mFolderFileList
@@ -653,10 +674,14 @@ Public Class frmMain
     ''' <remarks></remarks>
     Public Sub ShowFolderFileListProgress(ByVal pProgress As FolderFileListProgress)
 
-		'フォルダファイルリスト作成中ラベルが「対象フォルダ内のフォルダ・ファイル数を計算しています」の時
-		If frmWait.Instance.lblMaking.Text = frmWait._cMessage.Calculating Then
+		'フォルダファイルリスト作成中ラベルを取得
+		'※「．」文字列を除いた部分
+		Dim mMakingText As String = frmWait.Instance.lblMaking.Text.Replace(frmWait._cMessage.MaikingDot, "")
 
-			'「対象フォルダ内のフォルダ・ファイル数を計算しています」文言からフォルダファイルリスト作成中に変更
+		'フォルダファイルリスト作成中ラベルが「対象フォルダ内のフォルダ・ファイル数を計算しています」の時
+		If mMakingText = frmWait._cMessage.Calculating Then
+
+			'「対象フォルダ内のフォルダ・ファイル数を計算しています」文言から「フォルダファイルリスト作成中」に変更
 			frmWait.Instance.lblMaking.Text = frmWait._cMessage.Making
 
 		End If
@@ -698,6 +723,21 @@ Public Class frmMain
 
 		End Select
 
+		'保存ファイルの即時実行区分を画面に適用
+		Select Case Settings.Instance.Execute
+
+			Case CommandLine.ExecuteType.None
+
+				'保存ファイルの即時実行区分にアンチェック
+				chkRunSaveFile.Checked = False
+
+			Case CommandLine.ExecuteType.Run
+
+				'保存ファイルの即時実行区分にチェック
+				chkRunSaveFile.Checked = True
+
+		End Select
+
 		'リスト表示の最大表示ファイル数をセット
 		txtMaxCountInPage.Text = Settings.Instance.MaxCountInPage
 
@@ -720,15 +760,28 @@ Public Class frmMain
 
 		End Select
 
+		'保存ファイルの即時実行区分を取得し設定クラスにセット
+		Select Case True
+
+			Case chkRunSaveFile.Checked = False
+
+				Settings.Instance.Execute = CommandLine.ExecuteType.None
+
+			Case chkRunSaveFile.Checked = True
+
+				Settings.Instance.Execute = CommandLine.ExecuteType.Run
+
+		End Select
+
 		'リスト表示の最大表示ファイル数が正しい値の時
 		If _ValidateMaxCountInPageValue() Then
 
-			'リスト表示の最大表示ファイル数テキストボックスの内容をセット
+			'リスト表示の最大表示ファイル数テキストボックスの内容を設定クラスにセット
 			Settings.Instance.MaxCountInPage = txtMaxCountInPage.Text
 
 		Else
 
-			'リスト表示の最大表示ファイル数のデフォルトをセット
+			'リスト表示の最大表示ファイル数のデフォルトを設定クラスにセット
 			Settings.Instance.MaxCountInPage = frmResultGridView.cGridViewDataMaxCountInPage
 
 		End If
@@ -754,8 +807,7 @@ Public Class frmMain
 
 		End If
 
-		'コマンドライン引数を表示
-		'※デバッグモード時のみ実行される
+		'コマンドライン引数を表示（デバッグモード時のみ実行される）
 		DebugMode.ShowCommandLineArg()
 
 		'コマンドライン引数の内容を画面にセット
@@ -791,7 +843,20 @@ Public Class frmMain
 
 		End Select
 
-		'リスト表示の最大表示ファイル数をセット
+		'保存ファイルの即時実行区分を画面に適用
+		Select Case CommandLine.Instance.Execute
+
+			Case CommandLine.ExecuteType.None
+
+				chkRunSaveFile.Checked = False
+
+			Case CommandLine.ExecuteType.Run
+
+				chkRunSaveFile.Checked = True
+
+		End Select
+
+		'リスト表示の最大表示ファイル数を画面に適用
 		txtMaxCountInPage.Text = CommandLine.Instance.MaxCountInPage
 
 	End Sub

@@ -85,20 +85,27 @@ Public Class frmResultGridView
 		''' <remarks></remarks>
 		Public Const NoticeMessageTitle As String = "リスト表示フォーム"
 
-		''' <summary>Messenger風通知メッセージ内容</summary>
-		''' <remarks>コマンド処理用</remarks>
-		Public Shared NoticeMessageDetail As String = "リスト表示の" & CommandLine.Instance.Extension.ToString & "形式を" _
-													  & Environment.NewLine & "クリップボードにコピーしました"
+        ''' <summary>Messenger風通知メッセージ内容：クリップボードにコピーしました</summary>
+        ''' <remarks>コマンド処理用</remarks>
+        Public Shared NoticeCommandMessageCopyToClipBoard As String = "リスト表示の" & CommandLine.Instance.Extension.ToString & "形式を" _
+                                                                    & Environment.NewLine & "クリップボードにコピーしました"
 
-		''' <summary>Messenger風通知メッセージ内容の前部分</summary>
-		''' <remarks></remarks>
-		Public Const NoticeMessageBeforeDetail As String = "リスト表示の"
+        ''' <summary>Messenger風通知メッセージ内容：クリップボードにコピーしました</summary>
+        ''' <param name="pFileFormat">ファイルの出力形式</param>
+        ''' <returns>ファイル出力形式に対応したクリップボードにコピーしました文言</returns>
+        ''' <remarks></remarks>
+        Public Shared Function NoticeMessageCopyToClipBoard(ByVal pFileFormat As OutputFileFormat) As String
 
-		''' <summary>Messenger風通知メッセージ内容の後部分</summary>
-		''' <remarks></remarks>
-		Public Shared NoticeMessageAfterDetail As String = "形式を" & Environment.NewLine & "クリップボードにコピーしました"
+			Return "リスト表示の" & pFileFormat.ToString & "形式を" & Environment.NewLine _
+				 & "クリップボードにコピーしました"
 
-	End Class
+        End Function
+
+        ''' <summary>Messenger風通知メッセージ：保存したファイルを実行しました</summary>
+        ''' <remarks></remarks>
+        Public Const NoticeMessageRunSaveFile As String = "保存したファイルを実行しました"
+
+    End Class
 
 	''' <summary>データグリッドビューで使用するカラー</summary>
 	''' <remarks></remarks>
@@ -722,20 +729,27 @@ Public Class frmResultGridView
 
 			Case Windows.Forms.DialogResult.Yes
 
-				'CSVファイル保存処理
-				Call _SaveOutputFile(OutputFileFormat.CSV, _FolderFileList.TargetPathFolderName, cEncording.ShiftJis)
+                'CSVファイル保存・実行処理が行われた時
+                If _SaveRunOutputFile(OutputFileFormat.CSV, _FolderFileList.TargetPathFolderName, cEncording.ShiftJis) Then
 
-			Case Windows.Forms.DialogResult.No
+                    '保存したファイルを実行しました通知を表示
+                    MyBase.ShowPopupMessage(_cMessage.NoticeMessageTitle, _cMessage.NoticeMessageRunSaveFile)
+
+                    '非同期でMessenger風通知メッセージが非表示になるまで待機
+                    Await Task.Run(Sub() System.Threading.Thread.Sleep(frmPopupMessage._cMessageDisplayTotalTime))
+
+                End If
+
+            Case Windows.Forms.DialogResult.No
 
 				'出力用テキストをクリップボードコピー
 				Clipboard.SetText(_GetOutputFileText(OutputFileFormat.CSV))
 
-				'クリップボードにコピーしました通知を表示
-				Dim mFrmPopupMessage As New frmPopupMessage(_cMessage.NoticeMessageTitle, _cMessage.NoticeMessageBeforeDetail & OutputDelimiterText.Delimiter.CSV.ToString & _cMessage.NoticeMessageAfterDetail)
-				mFrmPopupMessage.Show()
+                'クリップボードにコピーしました通知を表示
+				MyBase.ShowPopupMessage(_cMessage.NoticeMessageTitle, _cMessage.NoticeMessageCopyToClipBoard(OutputFileFormat.CSV))
 
-				'非同期でMessenger風通知メッセージが非表示になるまで待機
-				Await Task.Run(Sub() System.Threading.Thread.Sleep(frmPopupMessage._cMessageDisplayTotalTime))
+                '非同期でMessenger風通知メッセージが非表示になるまで待機
+                Await Task.Run(Sub() System.Threading.Thread.Sleep(frmPopupMessage._cMessageDisplayTotalTime))
 
 		End Select
 
@@ -752,17 +766,25 @@ Public Class frmResultGridView
 
 			Case Windows.Forms.DialogResult.Yes
 
-				'TSVファイル保存処理
-				Call _SaveOutputFile(OutputFileFormat.TSV, _FolderFileList.TargetPathFolderName, cEncording.ShiftJis)
+                'TSVファイル保存・実行処理が行われた時
+                If _SaveRunOutputFile(OutputFileFormat.TSV, _FolderFileList.TargetPathFolderName, cEncording.ShiftJis) Then
 
-			Case Windows.Forms.DialogResult.No
+                    '保存したファイルを実行しました通知を表示
+                    MyBase.ShowPopupMessage(_cMessage.NoticeMessageTitle, _cMessage.NoticeMessageRunSaveFile)
+
+                    '非同期でMessenger風通知メッセージが非表示になるまで待機
+                    Await Task.Run(Sub() System.Threading.Thread.Sleep(frmPopupMessage._cMessageDisplayTotalTime))
+
+                End If
+
+            Case Windows.Forms.DialogResult.No
 
 				'出力用テキストをクリップボードコピー
 				Clipboard.SetText(_GetOutputFileText(OutputFileFormat.TSV))
 
-				'クリップボードにコピーしました通知を表示
-				Dim mFrmPopupMessage As New frmPopupMessage(_cMessage.NoticeMessageTitle, _cMessage.NoticeMessageBeforeDetail & OutputDelimiterText.Delimiter.TSV.ToString & _cMessage.NoticeMessageAfterDetail)
-				mFrmPopupMessage.Show()
+                'クリップボードにコピーしました通知を表示
+				Dim mFrmPopupMessage As New frmPopupMessage(_cMessage.NoticeMessageTitle, _cMessage.NoticeMessageCopyToClipBoard(OutputFileFormat.TSV))
+                mFrmPopupMessage.Show()
 
 				'非同期でMessenger風通知メッセージが非表示になるまで待機
 				Await Task.Run(Sub() System.Threading.Thread.Sleep(frmPopupMessage._cMessageDisplayTotalTime))
@@ -771,22 +793,30 @@ Public Class frmResultGridView
 
 	End Sub
 
-	''' <summary>html出力ボタンクリックイベント</summary>
-	''' <param name="sender">html出力ボタン</param>
-	''' <param name="e">Clickイベント</param>
-	''' <remarks></remarks>
-	Private Sub btnHtmlOutput_Click(sender As Object, e As EventArgs) Handles btnHtmlOutput.Click
+    ''' <summary>html出力ボタンクリックイベント</summary>
+    ''' <param name="sender">html出力ボタン</param>
+    ''' <param name="e">Clickイベント</param>
+    ''' <remarks></remarks>
+    Private Async Sub btnHtmlOutput_Click(sender As Object, e As EventArgs) Handles btnHtmlOutput.Click
 
-		'Htmlファイル保存処理
-		Call _SaveOutputFile(OutputFileFormat.HTML, _FolderFileList.TargetPathFolderName, cEncording.UTF8)
+        'HTMLファイル保存・実行処理が行われた時
+        If _SaveRunOutputFile(OutputFileFormat.HTML, _FolderFileList.TargetPathFolderName, cEncording.UTF8) Then
 
-	End Sub
+            '保存したファイルを実行しました通知を表示
+            MyBase.ShowPopupMessage(_cMessage.NoticeMessageTitle, _cMessage.NoticeMessageRunSaveFile)
 
-	''' <summary>出力文字列フォームボタンクリックイベント</summary>
-	''' <param name="sender">出力文字列フォームボタン</param>
-	''' <param name="e">Clickイベント</param>
-	''' <remarks></remarks>
-	Private Sub btnResultTextForm_Click(sender As Object, e As EventArgs) Handles btnResultTextForm.Click
+            '非同期でMessenger風通知メッセージが非表示になるまで待機
+            Await Task.Run(Sub() System.Threading.Thread.Sleep(frmPopupMessage._cMessageDisplayTotalTime))
+
+        End If
+
+    End Sub
+
+    ''' <summary>出力文字列フォームボタンクリックイベント</summary>
+    ''' <param name="sender">出力文字列フォームボタン</param>
+    ''' <param name="e">Clickイベント</param>
+    ''' <remarks></remarks>
+    Private Sub btnResultTextForm_Click(sender As Object, e As EventArgs) Handles btnResultTextForm.Click
 
 		'リスト表示フォームを非表示
 		Me.Hide()
@@ -897,7 +927,7 @@ Public Class frmResultGridView
 					Dim mFileFullPath As String = _GetFullPathFromGridViewCell(mDgv, mSelectedCell)
 
 					'フルパスを取得出来た時、ファイルを実行
-					If Not String.IsNullOrEmpty(mFileFullPath) Then _RunFile(mFileFullPath)
+					If Not String.IsNullOrEmpty(mFileFullPath) Then MyBase.RunFile(mFileFullPath)
 
 				Next
 
@@ -924,7 +954,7 @@ Public Class frmResultGridView
 			Dim mFileFullPath As String = _GetFullPathFromGridViewCell(mDgv, mDgv.CurrentCell)
 
 			'フルパスを取得出来た時、ファイルを実行
-			If Not String.IsNullOrEmpty(mFileFullPath) Then _RunFile(mFileFullPath)
+			If Not String.IsNullOrEmpty(mFileFullPath) Then MyBase.RunFile(mFileFullPath)
 
 		End If
 
@@ -978,8 +1008,7 @@ Public Class frmResultGridView
 		'フォームのタイトルにコマンドモード文言を追加
 		CommandLine.SetCommandModeToTitle(Me)
 
-		'フォームのタイトルにデバッグモード文言を追加
-		'※デバッグモード時のみ実行される
+		'フォームのタイトルにデバッグモード文言を追加（デバッグモード時のみ実行される）
 		DebugMode.SetDebugModeTitle(Me)
 
 	End Sub
@@ -1065,8 +1094,7 @@ Public Class frmResultGridView
 		dgvFolderFileList.Columns(FolderFileListColumn.IsLastFileInFolder).Visible = False
 		dgvFolderFileList.Columns(FolderFileListColumn.DispString).Visible = False
 
-		'全てのカラムを表示する
-		'※デバッグモード時のみ実行される
+		'全てのカラムを表示する（デバッグモード時のみ実行される）
 		DebugMode.DisplayAllColumnForFrmResultGridView(CType(Me, frmResultGridView))
 
 		'----------------------------------------
@@ -1572,50 +1600,47 @@ Public Class frmResultGridView
 
 	End Function
 
-	''' <summary>ファイルの実行処理</summary>
-	''' <param name="pPath">実行ファイルのフルパス</param>
-	''' <remarks></remarks>
-	Private Sub _RunFile(ByVal pPath As String)
-
-		Dim mPsi As New System.Diagnostics.ProcessStartInfo()
-
-		'関連付けで実行するファイルのフルパスを指定
-		mPsi.FileName = pPath
-
-		'ファイルの実行処理
-		System.Diagnostics.Process.Start(mPsi)
-
-	End Sub
-
 #End Region
 
 #Region "「Html・CSV・TSV」出力用メソッド"
 
-	''' <summary>出力ファイルの保存処理</summary>
-	''' <param name="pFileFormat">出力形式</param>
-	''' <param name="pDefalutFileName">保存ファイルのデフォルトのファイル名</param>
-	''' <param name="pEncording">エンコード</param>
-	''' <remarks></remarks>
-	Private Sub _SaveOutputFile(ByVal pFileFormat As OutputFileFormat, ByVal pDefalutFileName As String, ByVal pEncording As System.Text.Encoding)
+    ''' <summary>出力ファイルの保存・実行処理</summary>
+    ''' <param name="pFileFormat">出力形式</param>
+    ''' <param name="pDefalutFileName">保存ファイルのデフォルトのファイル名</param>
+    ''' <param name="pEncording">エンコード</param>
+    ''' <returns>True ：保存ファイルの実行
+    '''          False：保存ファイルを実行しない</returns>
+    ''' <remarks></remarks>
+    Private Function _SaveRunOutputFile(ByVal pFileFormat As OutputFileFormat, ByVal pDefalutFileName As String, ByVal pEncording As System.Text.Encoding) As Boolean
 
-		'名前を付けて保存ダイアログを表示
-		Dim mDailog As SaveFileDialog = MyBase.GetSaveAsDialog(pDefalutFileName, pFileFormat.ToString.ToLower)
+        '名前を付けて保存ダイアログを表示
+        Dim mDialog As SaveFileDialog = MyBase.GetSaveAsDialog(pDefalutFileName, pFileFormat.ToString.ToLower)
 
-		'名前をつけて保存ダイアログでOKが押されたら
-		If mDailog.ShowDialog = Windows.Forms.DialogResult.OK Then
+        '名前をつけて保存ダイアログでOKが押されたら
+        If mDialog.ShowDialog = Windows.Forms.DialogResult.OK Then
 
-			'ファイルの保存処理
-			MyBase.WriteTextToOutputFile(_GetOutputFileText(pFileFormat), mDailog.FileName, pEncording)
+            'ファイルの保存処理
+            MyBase.WriteTextToOutputFile(_GetOutputFileText(pFileFormat), mDialog.FileName, pEncording)
 
-		End If
+            '実行タイプが実行の時、保存したファイルを関連付けで実行する
+			If Settings.Instance.Execute = ExecuteType.Run Then
 
-	End Sub
+				MyBase.RunFile(mDialog.FileName)
+				Return True
 
-	''' <summary>出力用ファイルのテキストデータを取得</summary>
-	''' <param name="pFileFormat">出力形式</param>
-	''' <returns>対象出力形式のテキストデータ</returns>
-	''' <remarks></remarks>
-	Private Function _GetOutputFileText(ByVal pFileFormat As OutputFileFormat) As String
+			End If
+
+        End If
+
+        Return False
+
+    End Function
+
+    ''' <summary>出力用ファイルのテキストデータを取得</summary>
+    ''' <param name="pFileFormat">出力形式</param>
+    ''' <returns>対象出力形式のテキストデータ</returns>
+    ''' <remarks></remarks>
+    Private Function _GetOutputFileText(ByVal pFileFormat As OutputFileFormat) As String
 
 		Dim mOutputText As String = String.Empty
 
@@ -1717,12 +1742,11 @@ Public Class frmResultGridView
 					'出力用テキストをクリップボードコピー
 					Clipboard.SetText(_GetOutputFileText(CommandLine.Instance.Extension))
 
-					'クリップボードにコピーしました通知を表示
-					Dim mFrmPopupMessage As New frmPopupMessage(_cMessage.NoticeMessageTitle, _cMessage.NoticeMessageDetail)
-					mFrmPopupMessage.Show()
+                    'クリップボードにコピーしました通知を表示
+                    MyBase.ShowPopupMessage(_cMessage.NoticeMessageTitle, _cMessage.NoticeCommandMessageCopyToClipBoard)
 
-					'非同期でMessenger風通知メッセージが非表示になるまで待機
-					Await Task.Run(Sub() System.Threading.Thread.Sleep(frmPopupMessage._cMessageDisplayTotalTime))
+                    '非同期でMessenger風通知メッセージが非表示になるまで待機
+                    Await Task.Run(Sub() System.Threading.Thread.Sleep(frmPopupMessage._cMessageDisplayTotalTime))
 
 					'メインフォームのリソースを破棄する
 					'※Closeをすると無限ループしてしまうのでDisposeで対応（これでいいのか不明……）
@@ -1736,13 +1760,21 @@ Public Class frmResultGridView
 					Dim mSaveFileEncord As System.Text.Encoding = cEncording.ShiftJis
 					If CommandLine.Instance.Extension = CommandLine.OutputFileFormat.HTML Then mSaveFileEncord = cEncording.UTF8
 
-					'出力用テキスト保存処理
-					Call _SaveOutputFile(CommandLine.Instance.Extension, _FolderFileList.TargetPathFolderName, mSaveFileEncord)
+                    '出力用テキスト保存・実行処理
+                    If _SaveRunOutputFile(CommandLine.Instance.Extension, _FolderFileList.TargetPathFolderName, mSaveFileEncord) Then
 
-					'メインフォームのリソースを破棄する
-					'※Closeをすると無限ループしてしまうのでDisposeで対応（これでいいのか不明……）
-					'  メインフォームを表示させず閉じるため
-					Me.Owner.Dispose()
+                        '保存したファイルを実行しました通知を表示
+                        MyBase.ShowPopupMessage(_cMessage.NoticeMessageTitle, _cMessage.NoticeMessageRunSaveFile)
+
+                        '非同期でMessenger風通知メッセージが非表示になるまで待機
+                        Await Task.Run(Sub() System.Threading.Thread.Sleep(frmPopupMessage._cMessageDisplayTotalTime))
+
+                    End If
+
+                    'メインフォームのリソースを破棄する
+                    '※Closeをすると無限ループしてしまうのでDisposeで対応（これでいいのか不明……）
+                    '  メインフォームを表示させず閉じるため
+                    Me.Owner.Dispose()
 
 			End Select
 
