@@ -23,20 +23,6 @@ End Interface
 ''' <remarks>フォームの共通処理を記述</remarks>
 Public Class frmCommon
 
-#Region "定数"
-
-	''' <summary>バージョン番号</summary>
-	''' <remarks>Chromeのバージョン表記を参考に付ける
-	'''            Chrome 5.0.307.11
-	'''                5：メジャーバージョン
-	'''                0：マイナーバージョン。この場合は、バージョン5の最初のもの
-	'''              307：累積バージョン。ビルドバージョン。Chromeが出てから307番目に作られたもの
-	'''               11：累積バージョンのマイナー番号（子番号）。リビジョン（修正版）
-	''' </remarks>
-	Public Const cVersionNumber As String = "Ver1.0.0.0"
-
-#End Region
-
 #Region "列挙体"
 
 	''' <summary>Alt+Tabウインドウタイプ</summary>
@@ -60,9 +46,6 @@ Public Class frmCommon
 	''' <param name="e">Loadイベント</param>
 	Private Sub CommonForm_Load(sender As Object, e As EventArgs) Handles Me.Load
 
-		'バージョン番号をフォームのテキストに表示
-		Call SetVerNumber(Me)
-
 		'全てのコントロールの最小サイズを設定
 		Call SetControlsForMinimumSize()
 
@@ -71,16 +54,6 @@ Public Class frmCommon
 #End Region
 
 #Region "メソッド"
-
-	''' <summary>バージョン番号をセット</summary>
-	''' <param name="pForm">対象フォーム</param>
-	''' <remarks></remarks>
-	Public Sub SetVerNumber(ByVal pForm As Form)
-
-		'フォームのテキストにバージョン番号を表記
-		Me.Text = Me.Text & "（" & cVersionNumber & "）"
-
-	End Sub
 
 	''' <summary>対象コントロール内のコントロールを取得する</summary>
 	''' <param name="pTopControl">対象コントロール</param>
@@ -223,18 +196,18 @@ Public Class frmCommon
 
 	End Sub
 
-	''' <summary>Messenger風通知メッセージを表示するウインドウを表示</summary>
-	''' <param name="pTitle">タイトル</param>
-	''' <param name="pMessage">メッセージ</param>
-	Public Sub ShowPopupMessage(ByVal pTitle As String, ByVal pMessage As String)
+    ''' <summary>Messenger風通知メッセージを表示するウインドウを表示</summary>
+    ''' <param name="pTitle">タイトル</param>
+    ''' <param name="pMessage">メッセージ</param>
+    Public Sub ShowPopupMessage(ByVal pTitle As String, ByVal pMessage As String)
 
-		'Messenger風通知メッセージを表示するウインドウのインスタンスを作成
-		Dim mFrmPopupMessage As New frmPopupMessage(pTitle, pMessage)
+        'Messenger風通知メッセージを表示するウインドウのインスタンスを作成
+        Dim mFrmPopupMessage As New frmPopupMessage(pTitle, pMessage)
 
-		'Messenger風通知メッセージを表示
-		mFrmPopupMessage.Show()
+        'Messenger風通知メッセージを表示
+        mFrmPopupMessage.Show()
 
-	End Sub
+    End Sub
 
 #End Region
 
