@@ -214,14 +214,14 @@ Public Class frmPopupMessage
 	''' <remarks></remarks>
 	Private Sub _SetInitialControlInScreen() Implements IFormCommonProcess._SetInitialControlInScreen
 
-		'--------------------------
-		' フォームの表示位置を設定
-		'--------------------------
-		'表示X座標 = プライマリーディスプレイの幅 - frmPopupMessageウインドウの幅
-		Dim mDisplayX As Integer = Screen.PrimaryScreen.Bounds.Width - Me.Width
+        '--------------------------
+        ' フォームの表示位置を設定
+        '--------------------------
+        '表示X座標 = プライマリーディスプレイの幅 - frmPopupMessageウインドウの幅
+        Dim mDisplayX As Integer = Screen.PrimaryScreen.Bounds.Width - Me.Width
 
-		'表示Y座標 = プライマリーディスプレイの高さ
-		Dim mDisplayY As Integer = Screen.PrimaryScreen.Bounds.Height
+        '表示Y座標 = プライマリーディスプレイの高さ
+        Dim mDisplayY As Integer = Screen.PrimaryScreen.Bounds.Height
 
 		'フォームの表示位置を設定
 		Me.DesktopLocation = New Point(mDisplayX, mDisplayY)

@@ -29,6 +29,10 @@ Public Class CommandLine
 		''' <remarks></remarks>
 		Public Const Extension As String = "/Extension"
 
+		''' <summary>実行タイプキーワード</summary>
+		''' <remarks></remarks>
+		Public Const Execute As String = "/Execute"
+
 		''' <summary>最大表示ファイル数キーワード</summary>
 		''' <remarks>リスト表示フォームの１ページ内の最大表示ファイル数</remarks>
 		Public Const PageSize As String = "/PageSize"
@@ -37,7 +41,7 @@ Public Class CommandLine
 
 	''' <summary>出力文字列フォーム対象拡張子リスト</summary>
 	''' <remarks></remarks>
-	Public Shared cTextFormExtensionList As New ArrayList From {OutputFileFormat.TEXT, OutputFileFormat.HTML}
+	Public Shared cTextFormExtensionList As New ArrayList From {OutputFileFormat.TXT, OutputFileFormat.HTML}
 
 	''' <summary>リスト表示フォーム対象拡張子リスト</summary>
 	''' <remarks></remarks>
@@ -79,6 +83,20 @@ Public Class CommandLine
 
 	End Enum
 
+	''' <summary>実行タイプ</summary>
+	''' <remarks></remarks>
+	Public Enum ExecuteType
+
+		''' <summary>実行しない</summary>
+		''' <remarks></remarks>
+		None
+
+		''' <summary>実行する</summary>
+		''' <remarks></remarks>
+		Run
+
+	End Enum
+
 	''' <summary>処理タイプ</summary>
 	''' <remarks></remarks>
 	Public Enum ProcessType
@@ -108,7 +126,7 @@ Public Class CommandLine
 
 		''' <summary>TEXT</summary>
 		''' <remarks></remarks>
-		TEXT
+		TXT
 
 		''' <summary>CSV</summary>
 		''' <remarks></remarks>
@@ -155,7 +173,11 @@ Public Class CommandLine
 
 		''' <summary>拡張子コマンド</summary>
 		''' <remarks>デフォルトはTEXTをセット</remarks>
-		Private Shared _Extension As OutputFileFormat = OutputFileFormat.TEXT
+		Private Shared _Extension As OutputFileFormat = OutputFileFormat.TXT
+
+		''' <summary>実行タイプコマンド</summary>
+		''' <remarks>デフォルトは実行しないをセット</remarks>
+		Private Shared _Execute As ExecuteType = ExecuteType.None
 
 		''' <summary>最大表示ファイル数コマンド</summary>
 		''' <remarks>デフォルトで1000をセット</remarks>
@@ -246,6 +268,23 @@ Public Class CommandLine
 
 		End Property
 
+		''' <summary>実行タイププロパティ</summary>
+		''' <remarks></remarks>
+		Public Property Execute As ExecuteType
+
+			Set(value As ExecuteType)
+
+				_Execute = value
+
+			End Set
+			Get
+
+				Return _Execute
+
+			End Get
+
+		End Property
+
 		''' <summary>最大表示ファイル数プロパティ</summary>
 		''' <remarks></remarks>
 		Public Property PageSize As Integer
@@ -315,8 +354,9 @@ Public Class CommandLine
 		''' <remarks></remarks>
 		Sub New(ByVal pCommandLineArg As String, ByVal pKeyWord As String)
 
+			'ToDo:もう少し検証の余地あり
 			'       コマンドライン引数よりもキーワードの方が文字数が多い時
-			'または 'コマンドライン引数の文字数よりキーワード＋１の文字数の方が大きかったら
+			'または コマンドライン引数の文字数よりキーワード＋１の文字数の方が大きかったら
 			If pCommandLineArg.Length < pKeyWord.Length _
 			OrElse pCommandLineArg.Length < pKeyWord.Length + 1 Then
 
@@ -418,6 +458,18 @@ Public Class CommandLine
 
 	End Property
 
+	''' <summary>実行タイププロパティ</summary>
+	''' <remarks></remarks>
+	Public ReadOnly Property Execute As ExecuteType
+
+		Get
+
+			Return _Commands.Execute
+
+		End Get
+
+	End Property
+
 	''' <summary>最大表示ファイル数プロパティ</summary>
 	''' <remarks>リスト表示の１ページ内最大表示ファイル数</remarks>
 	Public ReadOnly Property MaxCountInPage As Integer
@@ -468,6 +520,9 @@ Public Class CommandLine
 			'拡張子コマンドをセット、セット出来た時は次の繰り返しへ
 			If _SetExtensionCommand(mCommand, _Commands) Then Continue For
 
+			'実行タイプコマンドをセット、セット出来た時は次の繰り返しへ
+			If _SetExecuteCommand(mCommand, _Commands) Then Continue For
+
 			'最大表示ファイル数コマンドをセット、セット出来た時は次の繰り返しへ
 			If _SetPageSizeCommand(mCommand, _Commands) Then Continue For
 
@@ -475,6 +530,9 @@ Public Class CommandLine
 
 		'拡張子コマンドの値が不正だった時、正しい値をセットする
 		_Commands.Extension = _GetCorrectExtension(_Commands.FormType, _Commands.Extension)
+
+		'実行タイプコマンドの値が不正だった時、正しい値をセットする
+		_Commands.Execute = _GetCorrectExecute(_Commands.Output, _Commands.Execute)
 
 	End Sub
 
@@ -581,7 +639,7 @@ Public Class CommandLine
 		'コマンドライン引数から拡張子コマンドと拡張子を取得
 		Dim mCommand As New Command(pCommandLineArg, cKeyWords.Output)
 
-		'対象コマンドがフォームタイプコマンドの時
+		'対象コマンドが出力形式コマンドの時
 		If mCommand.KeyWord.ToLower = cKeyWords.Output.ToLower Then
 
 			Select Case mCommand.Value.ToLower
@@ -627,9 +685,9 @@ Public Class CommandLine
 
 			Select Case mCommand.Value.ToLower
 
-				Case OutputFileFormat.TEXT.ToString.ToLower
+				Case OutputFileFormat.TXT.ToString.ToLower
 
-					pCommands.Extension = OutputFileFormat.TEXT
+					pCommands.Extension = OutputFileFormat.TXT
 
 				Case OutputFileFormat.CSV.ToString.ToLower
 
@@ -659,6 +717,29 @@ Public Class CommandLine
 
 	End Function
 
+	''' <summary>実行タイプコマンドをセット</summary>
+	''' <param name="pCommandLineArg">対象コマンドライン引数</param>
+	''' <param name="pCommands">コマンドライン格納変数</param>
+	''' <returns>True ：実行タイプコマンドをセット 
+	'''          False：実行タイプコマンドを未セット</returns>
+	''' <remarks>対象のコマンドライン引数が出力形式コマンドの時、
+	'''          コマンドライン格納変数にセットする                   </remarks>
+	Private Function _SetExecuteCommand(ByVal pCommandLineArg As String, ByRef pCommands As CommandList) As Boolean
+
+		'対象コマンドが実行タイプコマンドの時
+		If pCommandLineArg.ToLower = cKeyWords.Execute.ToLower Then
+
+			pCommands.Execute = ExecuteType.Run
+			Return True
+
+		Else
+
+			Return False
+
+		End If
+
+	End Function
+
 	''' <summary>最大表示ファイル数コマンドをセット</summary>
 	''' <param name="pCommandLineArg">対象コマンドライン引数</param>
 	''' <param name="pCommands">コマンドライン格納変数</param>
@@ -671,7 +752,7 @@ Public Class CommandLine
 		'コマンドライン引数から拡張子コマンドと拡張子を取得
 		Dim mCommand As New Command(pCommandLineArg, cKeyWords.PageSize)
 
-		'対象コマンドがフォームタイプコマンドの時
+		'対象コマンドが最大表示ファイル数コマンドの時
 		If mCommand.KeyWord.ToLower = cKeyWords.PageSize.ToLower Then
 
 			Dim mSetPageSize As Integer
@@ -728,7 +809,7 @@ Public Class CommandLine
 	''' <remarks></remarks>
 	Private Function _GetCorrectExtension(ByVal pFormType As FormType, ByVal pExtension As OutputFileFormat) As OutputFileFormat
 
-		Dim CorrectExtension As OutputFileFormat = pExtension
+		Dim mCorrectExtension As OutputFileFormat = pExtension
 
 		'フォームタイプごと処理を分岐
 		Select Case pFormType
@@ -739,7 +820,7 @@ Public Class CommandLine
 				If Not cTextFormExtensionList.Contains(pExtension) Then
 
 					'出力文字列フォームのデフォルトの拡張子をセット
-					CorrectExtension = OutputFileFormat.TEXT
+					mCorrectExtension = OutputFileFormat.TXT
 
 				End If
 
@@ -749,13 +830,36 @@ Public Class CommandLine
 				If Not cListFormExtensionList.Contains(pExtension) Then
 
 					'リスト表示フォームのデフォルトの拡張子をセット
-					CorrectExtension = OutputFileFormat.CSV
+					mCorrectExtension = OutputFileFormat.CSV
 
 				End If
 
 		End Select
 
-		Return CorrectExtension
+		Return mCorrectExtension
+
+	End Function
+
+	''' <summary>実行タイプ正しい値を取得</summary>
+	''' <param name="pOutputType">出力形式</param>
+	''' <param name="pExecuteType">実行タイプコマンドの値</param>
+	''' <returns>正しい実行タイプコマンドの値</returns>
+	''' <remarks>出力形式が「名前を付けて保存ダイアログ」以外の時はこのコマンド
+	'''          を無視するため「実行しない」を返す                            </remarks>
+	Private Function _GetCorrectExecute(ByVal pOutputType As OutputType, ByVal pExecuteType As ExecuteType) As ExecuteType
+
+		'出力形式が「名前を付けて保存ダイアログ」以外の時
+		If pOutputType <> OutputType.SaveDialog Then
+
+			'「実行しない」を返す
+			Return ExecuteType.None
+
+		Else
+
+			'実行タイプをそのまま返す
+			Return pExecuteType
+
+		End If
 
 	End Function
 
@@ -773,6 +877,7 @@ Public Class CommandLine
 		With mCommnadListString
 
 			.AppendLine("ﾍﾙﾌﾟ　　　　　：/?                                           ")
+			.AppendLine("　　　　　　　　  ｺﾏﾝﾄﾞの一覧を表示します                    ")
 			.AppendLine("ﾌｫｰﾑﾀｲﾌﾟ　　　：/Form=(Text | List)                          ")
 			.AppendLine("　　　　　　　　※ﾃﾞﾌｫﾙﾄは「/Form=Text」                     ")
 			.AppendLine("　　　　　　　　　Text：出力文字列ﾌｫｰﾑ                       ")
@@ -793,6 +898,9 @@ Public Class CommandLine
 			.AppendLine("　　　　　　　　  csv,tsv,html(/Form=List)                   ")
 			.AppendLine("　　　　　　　　※htmlは以下の設定では使用出来ません         ")
 			.AppendLine("　　　　　　　　  「/Output=ClipBoard」                      ")
+			.AppendLine("実行　　　　　：/Execute                                     ")
+			.AppendLine("　　　　　　　　  保存したﾌｧｲﾙをただちに実行します           ")
+			.AppendLine("　　　　　　　　※「/Output=SaveDialog」時のみ使用可能です   ")
 			.AppendLine("最大表示ﾌｧｲﾙ数：/PageSize=数値                               ")
 			.AppendLine("　　　　　　　　※ﾃﾞﾌｫﾙﾄは「/PageSize=1000」                 ")
 			.AppendLine("　　　　　　　　　数値のみ有効でそれ以外は無視されます       ")
@@ -801,10 +909,6 @@ Public Class CommandLine
 			.AppendLine("★不正なｺﾏﾝﾄﾞﾗｲﾝ引数を使用した場合★　　　　　　　　         ")
 			.AppendLine("　不正なｷｰﾜｰﾄﾞの場合は無視されます                           ")
 			.AppendLine("　不正な値の場合はﾃﾞﾌｫﾙﾄ設定で実行されます                   ")
-			.AppendLine("                                                             ")
-			.AppendLine("★使用例★                                                   ")
-			.AppendLine("　FolderFileList.exe ""ﾌｫﾙﾀﾞﾊﾟｽ"" /Form=List                 ")
-			.AppendLine("　※ﾌｫﾙﾀﾞﾊﾟｽをﾘｽﾄ表示ﾌｫｰﾑで表示                              ")
 
 		End With
 
@@ -841,20 +945,17 @@ Public Class CommandLine
 
 			.AppendLine("①フォルダパス                         ")
 			.AppendLine("→" & Instance.FolderPath & "          ")
-			.AppendLine("                                       ")
 			.AppendLine("②ヘルプ                               ")
 			.AppendLine("→" & Instance.HasHelpCommand & "      ")
-			.AppendLine("                                       ")
 			.AppendLine("③フォームタイプ                       ")
 			.AppendLine("→" & Instance.TargetForm.ToString & " ")
-			.AppendLine("                                       ")
 			.AppendLine("④出力形式                             ")
 			.AppendLine("→" & Instance.Output.ToString & "     ")
-			.AppendLine("                                       ")
 			.AppendLine("⑤拡張子                               ")
 			.AppendLine("→" & Instance.Extension.ToString & "  ")
-			.AppendLine("                                       ")
-			.AppendLine("⑥最大表示ファイル数                   ")
+			.AppendLine("⑥実行タイプ                           ")
+			.AppendLine("→" & Instance.Execute.ToString & "    ")
+			.AppendLine("⑦最大表示ファイル数                   ")
 			.AppendLine("→" & Instance.MaxCountInPage & "      ")
 
 		End With
@@ -885,6 +986,8 @@ Public Class CommandLine
 			.AppendLine("→" & Instance.Output.ToString & "     ")
 			.AppendLine("⑤拡張子                               ")
 			.AppendLine("→" & Instance.Extension.ToString & "  ")
+			.AppendLine("⑥実行タイプ                           ")
+			.AppendLine("→" & Instance.Execute.ToString & "    ")
 			.AppendLine("⑥最大表示ファイル数                   ")
 			.AppendLine("→" & Instance.MaxCountInPage & "      ")
 

@@ -47,7 +47,7 @@ Partial Class frmWait
 		Me.ssProgress.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tspbProgressRate, Me.tsslStatus})
 		Me.ssProgress.Location = New System.Drawing.Point(0, 59)
 		Me.ssProgress.Name = "ssProgress"
-		Me.ssProgress.Size = New System.Drawing.Size(374, 22)
+		Me.ssProgress.Size = New System.Drawing.Size(444, 22)
 		Me.ssProgress.TabIndex = 1
 		Me.ssProgress.Text = "StatusStrip1"
 		'
@@ -59,7 +59,7 @@ Partial Class frmWait
 		'tsslStatus
 		'
 		Me.tsslStatus.Name = "tsslStatus"
-		Me.tsslStatus.Size = New System.Drawing.Size(257, 17)
+		Me.tsslStatus.Size = New System.Drawing.Size(327, 17)
 		Me.tsslStatus.Spring = True
 		Me.tsslStatus.Text = "0％完了"
 		Me.tsslStatus.TextAlign = System.Drawing.ContentAlignment.MiddleRight
@@ -69,7 +69,7 @@ Partial Class frmWait
 		Me.ssDisplayFoloderFile.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tsslProcessingFolderFile})
 		Me.ssDisplayFoloderFile.Location = New System.Drawing.Point(0, 37)
 		Me.ssDisplayFoloderFile.Name = "ssDisplayFoloderFile"
-		Me.ssDisplayFoloderFile.Size = New System.Drawing.Size(374, 22)
+		Me.ssDisplayFoloderFile.Size = New System.Drawing.Size(444, 22)
 		Me.ssDisplayFoloderFile.TabIndex = 3
 		Me.ssDisplayFoloderFile.Text = "StatusStrip1"
 		'
@@ -83,11 +83,11 @@ Partial Class frmWait
 		'
 		Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
 		Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-		Me.ClientSize = New System.Drawing.Size(374, 81)
+		Me.ClientSize = New System.Drawing.Size(444, 81)
 		Me.Controls.Add(Me.ssDisplayFoloderFile)
 		Me.Controls.Add(Me.ssProgress)
 		Me.Controls.Add(Me.lblMaking)
-		Me.MinimumSize = New System.Drawing.Size(390, 100)
+		Me.MinimumSize = New System.Drawing.Size(460, 100)
 		Me.Name = "frmWait"
 		Me.Opacity = 0.0R
 		Me.Text = "リスト作成中"

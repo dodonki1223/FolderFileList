@@ -181,6 +181,34 @@ Public Class frmCommon
 
 	End Sub
 
+	''' <summary>ファイルの実行処理</summary>
+	''' <param name="pPath">実行ファイルのフルパス</param>
+	''' <remarks></remarks>
+	Public Sub RunFile(ByVal pPath As String)
+
+		Dim mPsi As New System.Diagnostics.ProcessStartInfo()
+
+		'関連付けで実行するファイルのフルパスを指定
+		mPsi.FileName = pPath
+
+		'ファイルの実行処理
+		System.Diagnostics.Process.Start(mPsi)
+
+	End Sub
+
+    ''' <summary>Messenger風通知メッセージを表示するウインドウを表示</summary>
+    ''' <param name="pTitle">タイトル</param>
+    ''' <param name="pMessage">メッセージ</param>
+    Public Sub ShowPopupMessage(ByVal pTitle As String, ByVal pMessage As String)
+
+        'Messenger風通知メッセージを表示するウインドウのインスタンスを作成
+        Dim mFrmPopupMessage As New frmPopupMessage(pTitle, pMessage)
+
+        'Messenger風通知メッセージを表示
+        mFrmPopupMessage.Show()
+
+    End Sub
+
 #End Region
 
 End Class

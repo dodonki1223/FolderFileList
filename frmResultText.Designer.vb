@@ -39,11 +39,11 @@ Partial Class frmResultText
 		'
 		'btnTextOutput
 		'
-		Me.btnTextOutput.Location = New System.Drawing.Point(437, 520)
+		Me.btnTextOutput.Location = New System.Drawing.Point(432, 520)
 		Me.btnTextOutput.Name = "btnTextOutput"
-		Me.btnTextOutput.Size = New System.Drawing.Size(80, 23)
+		Me.btnTextOutput.Size = New System.Drawing.Size(85, 23)
 		Me.btnTextOutput.TabIndex = 1
-		Me.btnTextOutput.Text = "Text出力(T)"
+		Me.btnTextOutput.Text = "TEXT出力(T)"
 		Me.btnTextOutput.UseVisualStyleBackColor = True
 		'
 		'txtFolderFileList
@@ -61,11 +61,11 @@ Partial Class frmResultText
 		'
 		'btnHtmlOutput
 		'
-		Me.btnHtmlOutput.Location = New System.Drawing.Point(351, 520)
+		Me.btnHtmlOutput.Location = New System.Drawing.Point(341, 520)
 		Me.btnHtmlOutput.Name = "btnHtmlOutput"
-		Me.btnHtmlOutput.Size = New System.Drawing.Size(80, 23)
+		Me.btnHtmlOutput.Size = New System.Drawing.Size(85, 23)
 		Me.btnHtmlOutput.TabIndex = 3
-		Me.btnHtmlOutput.Text = "html出力(H)"
+		Me.btnHtmlOutput.Text = "HTML出力(H)"
 		Me.btnHtmlOutput.UseVisualStyleBackColor = True
 		'
 		'frmResultText

@@ -73,7 +73,7 @@ Public Class frmWait
 
 	End Property
 
-	''' <summary>出力文字列フォームインスタンス存在プロパティ</summary>
+	''' <summary>フォルダファイルリスト作成中を表示するフォームインスタンス存在プロパティ</summary>
 	''' <remarks></remarks>
 	Public Shared ReadOnly Property HasInstance() As Boolean
 
@@ -202,22 +202,18 @@ Public Class frmWait
     ''' <remarks></remarks>
 	Public Sub _SwitchingMakingString(ByVal sender As Object, ByVal e As EventArgs)
 
-		'フォルダファイルリスト作成中ラベルが「対象フォルダ内のフォルダ・ファイル数を計算しています」だったら処理を終了
-		'※フォルダファイルリスト作成中の時、「．」を増やすため
-		If lblMaking.Text = _cMessage.Calculating Then Exit Sub
-
 		'「．」文字列をカウントする
 		Dim mDotCount As Integer = _GetCountCharForTargetChar(lblMaking.Text, _cMessage.MaikingDot)
 
 		'「．」文字列のカウント数が「．」文字列の最高カウント数と同じだったら
 		If mDotCount = _cMessage.MakingDotMaxCount Then
 
-			'フォームに共通メッセージ＋「．」をセット
-			lblMaking.Text = _cMessage.Making & _cMessage.MaikingDot
+			'フォームに現在表示されている文字列（「．」を含まない）＋「．」をセット
+			lblMaking.Text = lblMaking.Text.Replace(_cMessage.MaikingDot, "") & _cMessage.MaikingDot
 
 		Else
 
-			'フォームに現在表示されている作成中文字列＋「．」をセット
+			'フォームに現在表示されている文字列（「．」を含む）＋「．」をセット
 			lblMaking.Text = lblMaking.Text & _cMessage.MaikingDot
 
 		End If
@@ -251,8 +247,7 @@ Public Class frmWait
 		'ウインドウをAlt+Tabに表示させない
 		MyBase.SetShowHideAltTabWindow(AltTabType.Hide)
 
-		'フォームのタイトルにデバッグモード文言を追加
-		'※デバッグモード時のみ実行される
+		'フォームのタイトルにデバッグモード文言を追加（デバッグモード時のみ実行される）
 		DebugMode.SetDebugModeTitle(Me)
 
 	End Sub
