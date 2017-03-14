@@ -841,6 +841,23 @@ Public Class frmResultGridView
 
 	End Sub
 
+	''' <summary>名前テキストボックスKeyPressイベント</summary>
+	''' <param name="sender">名前テキストボックス</param>
+	''' <param name="e">KeyPressイベント</param>
+	''' <remarks></remarks>
+	Private Sub txtName_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txtName.KeyPress
+
+		'押されたキーがEnterまたはEscapeの時
+		If e.KeyChar = Microsoft.VisualBasic.ChrW(Keys.Enter) _
+		OrElse e.KeyChar = Microsoft.VisualBasic.ChrW(Keys.Escape) Then
+
+			'キーの入力イベントを処理済みにする（ビープ音を鳴らさない）
+			e.Handled = True
+
+		End If
+
+	End Sub
+
 	''' <summary>名前テキストボックスMouseDownイベント</summary>
 	''' <param name="sender">名前テキストボックス</param>
 	''' <param name="e">MouseDownイベント</param>
