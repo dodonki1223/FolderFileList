@@ -574,7 +574,7 @@ Public Class OutputHtml
 			.AppendLine("        $('.' + className).each(function() {                                                                                                   ")
 			.AppendLine("                                                                                                                                               ")
 			.AppendLine("          //「className」と名の付くタグのテキストと親要素のdisplayの状態を取得                                                                 ")
-			.AppendLine("          var targetTag = $(this).text() ,                                                                                                     ")
+			.AppendLine("          var targetTag = $(this).text().toLowerCase() ,                                                                                       ")
 			.AppendLine("              parentDisplayState = $(this).parent().css('display');                                                                            ")
 			.AppendLine("                                                                                                                                               ")
 			.AppendLine("          //     「className」と名の付くタグのテキストが「target」と一致                                                                       ")
