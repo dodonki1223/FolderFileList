@@ -17,7 +17,7 @@ Public Class OutputHtml
 
 	''' <summary>フォルダファイルリストのドキュメントURL</summary>
 	''' <remarks></remarks>
-	Public Const cFolderFileListDocumentURL As String = "https://github.com/dodonki1223/FolderFileList/tree/master/docs"
+	Public Const cFolderFileListDocumentURL As String = "https://github.com/dodonki1223/FolderFileList/blob/master/docs/README.md"
 
 	''' <summary>Selectタグ初期値</summary>
 	''' <remarks></remarks>
@@ -579,7 +579,7 @@ Public Class OutputHtml
 			.AppendLine("                                                                                                                                               ")
 			.AppendLine("          //     「className」と名の付くタグのテキストが「target」と一致                                                                       ")
 			.AppendLine("          // かつ「className」と名の付くタグの親要素のdisplayの状態が「none」でない時                                                          ")
-			.AppendLine("          if (targetTag === target && parentDisplayState != 'none') {                                                                          ")
+			.AppendLine("          if (targetTag === target.toLowerCase() && parentDisplayState != 'none') {                                                            ")
 			.AppendLine("                                                                                                                                               ")
 			.AppendLine("                //「className」と名の付くタグの親要素を表示                                                                                    ")
 			.AppendLine("                $(this).parent().show();                                                                                                       ")
