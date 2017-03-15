@@ -266,7 +266,7 @@ Public Class frmResultText
 
 #Region "ボタン"
 
-	''' <summary>Text出力ボタンクリックイベント</summary>
+	''' <summary>TEXT出力ボタンクリックイベント</summary>
 	''' <param name="sender">Text出力ボタン</param>
 	''' <param name="e">Clickイベント</param>
 	''' <remarks></remarks>
@@ -303,14 +303,22 @@ Public Class frmResultText
 
 	End Sub
 
-	''' <summary>html出力ボタンクリックイベント</summary>
+	''' <summary>HTML出力ボタンクリックイベント</summary>
 	''' <param name="sender">html出力ボタン</param>
 	''' <param name="e">Clickイベント</param>
 	''' <remarks></remarks>
-	Private Sub btnHtmlOutput_Click(sender As Object, e As EventArgs) Handles btnHtmlOutput.Click
+	Private Async Sub btnHtmlOutput_Click(sender As Object, e As EventArgs) Handles btnHtmlOutput.Click
 
 		'HTMLファイル保存・実行処理
-		Call _SaveRunOutputFile(OutputFileFormat.HTML, _FolderFileList.TargetPathFolderName, cEncording.UTF8)
+		If _SaveRunOutputFile(OutputFileFormat.HTML, _FolderFileList.TargetPathFolderName, cEncording.UTF8) Then
+
+			'保存したファイルを実行しました通知を表示
+			MyBase.ShowPopupMessage(_cMessage.NoticeMessageTitle, _cMessage.NoticeMessageRunSaveFile)
+
+			'非同期でMessenger風通知メッセージが非表示になるまで待機
+			Await Task.Run(Sub() System.Threading.Thread.Sleep(frmPopupMessage._cMessageDisplayTotalTime))
+
+		End If
 
 	End Sub
 

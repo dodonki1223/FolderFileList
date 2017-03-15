@@ -531,9 +531,6 @@ Public Class CommandLine
 		'拡張子コマンドの値が不正だった時、正しい値をセットする
 		_Commands.Extension = _GetCorrectExtension(_Commands.FormType, _Commands.Extension)
 
-		'実行タイプコマンドの値が不正だった時、正しい値をセットする
-		_Commands.Execute = _GetCorrectExecute(_Commands.Output, _Commands.Execute)
-
 	End Sub
 
 #End Region
@@ -837,29 +834,6 @@ Public Class CommandLine
 		End Select
 
 		Return mCorrectExtension
-
-	End Function
-
-	''' <summary>実行タイプ正しい値を取得</summary>
-	''' <param name="pOutputType">出力形式</param>
-	''' <param name="pExecuteType">実行タイプコマンドの値</param>
-	''' <returns>正しい実行タイプコマンドの値</returns>
-	''' <remarks>出力形式が「名前を付けて保存ダイアログ」以外の時はこのコマンド
-	'''          を無視するため「実行しない」を返す                            </remarks>
-	Private Function _GetCorrectExecute(ByVal pOutputType As OutputType, ByVal pExecuteType As ExecuteType) As ExecuteType
-
-		'出力形式が「名前を付けて保存ダイアログ」以外の時
-		If pOutputType <> OutputType.SaveDialog Then
-
-			'「実行しない」を返す
-			Return ExecuteType.None
-
-		Else
-
-			'実行タイプをそのまま返す
-			Return pExecuteType
-
-		End If
 
 	End Function
 
