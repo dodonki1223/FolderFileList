@@ -47,6 +47,8 @@ Public Class OutputHtml
 	''' <remarks></remarks>
 	Private _FolderFileList As FolderFileList
 
+	''' <summary>フォームの種類</summary>
+	''' <remarks></remarks>
 	Private _FormType As CommandLine.FormType
 
 #End Region
