@@ -1,5 +1,6 @@
-#以下のフォルダを含まない
+﻿#以下のフォルダを含まない
 /bin/
 /obj/
 /.vs/
 /FolderFileList.v11.suo
+/.docstates.suo
