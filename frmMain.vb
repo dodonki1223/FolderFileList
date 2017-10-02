@@ -695,10 +695,7 @@ Public Class frmMain
         frmWait.Instance.Show()
 
         'フォルダファイルリストの入れ物を作成
-        Dim mFolderFileList As New FolderFileList(pPath)
-
-        '処理進捗プロパティをセット
-        mFolderFileList.ProcessProgress = New Progress(Of FolderFileListProgress)(AddressOf ShowFolderFileListProgress)
+        Dim mFolderFileList As New FolderFileList(pPath, New Progress(Of FolderFileListProgress)(AddressOf ShowFolderFileListProgress))
 
         Try
 
@@ -749,17 +746,29 @@ Public Class frmMain
     ''' <remarks></remarks>
     Public Sub ShowFolderFileListProgress(ByVal pProgress As FolderFileListProgress)
 
-        'フォルダファイルリスト作成中ラベルを取得
-        '※「．」文字列を除いた部分
-        Dim mMakingText As String = frmWait.Instance.lblMaking.Text.Replace(frmWait._cMessage.MaikingDot, "")
+        'フォルダファイルリスト作成中ラベルを取得 ※「．」文字列を除いた部分
+        Dim mNowDisplayText As String = frmWait.Instance.lblMessage.Text.Replace(frmWait._cMessage.MaikingDot, "")
 
-        'フォルダファイルリスト作成中ラベルが「対象フォルダ内のフォルダ・ファイル数を計算しています」の時
-        If mMakingText = frmWait._cMessage.Calculating Then
+        '表示文言をセット
+        Dim mDisplayText As String = String.Empty
+        Select Case pProgress.FolderFileListProcessState
 
-            '「対象フォルダ内のフォルダ・ファイル数を計算しています」文言から「フォルダファイルリスト作成中」に変更
-            frmWait.Instance.lblMaking.Text = frmWait._cMessage.Making
+            Case FolderFileListProcessState.SetFileCount
 
-        End If
+                '現在の表示文言が「フォルダファイル計算中」で無い時、表示文言を「フォルダファイル計算中」に変更
+                If mNowDisplayText <> frmWait._cMessage.Calculating Then frmWait.Instance.lblMessage.Text = frmWait._cMessage.Calculating
+
+            Case FolderFileListProcessState.CreateFolderFileList
+
+                '現在の表示文言が「フォルダファイルリスト作成中」で無い時、表示文言を「フォルダファイルリスト作成中」に変更
+                If mNowDisplayText <> frmWait._cMessage.Making Then frmWait.Instance.lblMessage.Text = frmWait._cMessage.Making
+
+            Case FolderFileListProcessState.SetIsLastFileInFolder
+
+                '現在の表示文言が「フォルダファイルリストの終了処理を行っています」で無い時、表示文言を「フォルダファイルリストの終了処理を行っています」に変更
+                If mNowDisplayText <> frmWait._cMessage.SetIsLastFileInFolder Then frmWait.Instance.lblMessage.Text = frmWait._cMessage.SetIsLastFileInFolder
+
+        End Select
 
         'フォルダファイルリスト作成中フォームのプログレスバーに進捗率をセット
         frmWait.Instance.tspbProgressRate.Value = pProgress.Percent

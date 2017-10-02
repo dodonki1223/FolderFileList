@@ -22,6 +22,7 @@ Partial Class frmResultText
 	'コード エディターを使って変更しないでください。
 	<System.Diagnostics.DebuggerStepThrough()> _
 	Private Sub InitializeComponent()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmResultText))
         Me.btnResultGridView = New System.Windows.Forms.Button()
         Me.btnTextOutput = New System.Windows.Forms.Button()
         Me.txtFolderFileList = New System.Windows.Forms.TextBox()
@@ -165,7 +166,7 @@ Partial Class frmResultText
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.DeepSkyBlue
-        Me.ClientSize = New System.Drawing.Size(664, 642)
+        Me.ClientSize = New System.Drawing.Size(672, 649)
         Me.Controls.Add(Me.grpName)
         Me.Controls.Add(Me.grpExtension)
         Me.Controls.Add(Me.grpDisplayTarget)
@@ -173,9 +174,10 @@ Partial Class frmResultText
         Me.Controls.Add(Me.btnResultGridView)
         Me.Controls.Add(Me.btnTextOutput)
         Me.Controls.Add(Me.txtFolderFileList)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MinimumSize = New System.Drawing.Size(680, 680)
         Me.Name = "frmResultText"
-        Me.Opacity = 0.0R
+        Me.Opacity = 0R
         Me.Text = "出力文字列フォーム"
         Me.grpDisplayTarget.ResumeLayout(False)
         Me.grpDisplayTarget.PerformLayout()
@@ -186,7 +188,7 @@ Partial Class frmResultText
         Me.PerformLayout()
 
     End Sub
-	Friend WithEvents txtFolderFileList As System.Windows.Forms.TextBox
+    Friend WithEvents txtFolderFileList As System.Windows.Forms.TextBox
 	Friend WithEvents btnTextOutput As System.Windows.Forms.Button
 	Friend WithEvents btnResultGridView As Button
     Friend WithEvents btnHtmlOutput As System.Windows.Forms.Button

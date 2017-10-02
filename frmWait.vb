@@ -12,7 +12,7 @@ Public Class frmWait
     Private Const _cTimeToDisplayForForm As Integer = 3000
 
     ''' <summary>作成中文字列の表示切り替えるまでの時間</summary>
-    ''' <remarks>１秒</remarks>
+    ''' <remarks>５秒</remarks>
     Private Const _cTimeToSwitchingMakingString As Integer = 1000
 
     ''' <summary>フォルダファイルリスト作成中フォーム画面で使用するメッセージを提供する</summary>
@@ -31,9 +31,13 @@ Public Class frmWait
         ''' <remarks></remarks>
         Public Const MakingDotMaxCount As Integer = 6
 
-        ''' <summary>フォルダ・ファイル数計算中</summary>
+        ''' <summary>フォルダファイル数計算中</summary>
         ''' <remarks></remarks>
         Public Const Calculating As String = "対象フォルダ内のフォルダ・ファイル数を計算しています"
+
+        ''' <summary>終了処理を行っています</summary>
+        ''' <remarks></remarks>
+        Public Const SetIsLastFileInFolder As String = "フォルダファイルリストの終了処理を行っています"
 
     End Class
 
@@ -57,9 +61,13 @@ Public Class frmWait
 
 #Region "プロパティ"
 
-    ''' <summary>フォームにアクセスするためのプロパティ</summary>
-    ''' <remarks>※デザインパターンのSingletonパターンです
-    '''            インスタンスがただ１つであることを保証する</remarks>
+    ''' <summary>
+    '''   フォームにアクセスするためのプロパティ
+    ''' </summary>
+    ''' <remarks>
+    '''   ※デザインパターンのSingletonパターンです
+    '''     インスタンスがただ１つであることを保証する
+    ''' </remarks>
     Public Shared ReadOnly Property Instance() As frmWait
 
         Get
@@ -73,7 +81,9 @@ Public Class frmWait
 
     End Property
 
-    ''' <summary>フォルダファイルリスト作成中を表示するフォームインスタンス存在プロパティ</summary>
+    ''' <summary>
+    '''   フォルダファイルリスト作成中を表示するフォームインスタンス存在プロパティ
+    ''' </summary>
     ''' <remarks></remarks>
     Public Shared ReadOnly Property HasInstance() As Boolean
 
@@ -99,7 +109,9 @@ Public Class frmWait
 
 #Region "フォーム"
 
-    ''' <summary>フォームロードイベント</summary>
+    ''' <summary>
+    '''   フォームロードイベント
+    ''' </summary>
     ''' <param name="sender">Formオブジェクト</param>
     ''' <param name="e">Loadイベント</param>
     ''' <remarks></remarks>
@@ -116,11 +128,15 @@ Public Class frmWait
 
     End Sub
 
-    ''' <summary>フォームのFormClosingイベント</summary>
+    ''' <summary>
+    '''   フォームのFormClosingイベント
+    ''' </summary>
     ''' <param name="sender">Formオブジェクト</param>
     ''' <param name="e">FormClosingイベント</param>
-    ''' <remarks>フォームが閉じられようとした際に閉じる処理をキャンセルさせる時に使用するのがFormClosing
-    '''          フォームが閉じる前提で後処理するのがFormClosed                                          </remarks>
+    ''' <remarks>
+    '''   フォームが閉じられようとした際に閉じる処理をキャンセルさせる時に使用するのがFormClosing
+    '''   フォームが閉じる前提で後処理するのがFormClosed
+    ''' </remarks>
     Private Sub frmWait_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
 
         '作成中フォームのインスタンスが存在しない時は処理を終了
@@ -145,11 +161,15 @@ Public Class frmWait
 
     End Sub
 
-    ''' <summary>フォームのClosedイベント</summary>
+    ''' <summary>
+    '''   フォームのClosedイベント
+    ''' </summary>
     ''' <param name="sender">Formオブジェクト</param>
     ''' <param name="e">FormClosedイベント</param>
-    ''' <remarks>フォームが閉じられようとした際に閉じる処理をキャンセルさせる時に使用するのがFormClosing
-    '''          フォームが閉じる前提で後処理するのがFormClosed                                          </remarks>
+    ''' <remarks>
+    '''   フォームが閉じられようとした際に閉じる処理をキャンセルさせる時に使用するのがFormClosing
+    '''   フォームが閉じる前提で後処理するのがFormClosed
+    ''' </remarks>
     Private Sub frmWait_FormClosed(sender As Object, e As FormClosedEventArgs) Handles Me.FormClosed
 
         '作成中フォームのインスタンスが存在しない時は処理を終了
@@ -172,7 +192,9 @@ Public Class frmWait
 
 #Region "フォーム表示用タイマー"
 
-    ''' <summary>フォーム表示イベント</summary>
+    ''' <summary>
+    '''   フォーム表示イベント
+    ''' </summary>
     ''' <param name="sender">Timerオブジェクト</param>
     ''' <param name="e">Tickイベント</param>
     ''' <remarks></remarks>
@@ -196,25 +218,27 @@ Public Class frmWait
 
 #Region "作成中文字列の表示切り替え用タイマー"
 
-    ''' <summary>作成中文字列切り替え</summary>
+    ''' <summary>
+    '''   作成中文字列切り替え
+    ''' </summary>
     ''' <param name="sender">Timerオブジェクト</param>
     ''' <param name="e">Tickイベント</param>
     ''' <remarks></remarks>
     Public Sub _SwitchingMakingString(ByVal sender As Object, ByVal e As EventArgs)
 
         '「．」文字列をカウントする
-        Dim mDotCount As Integer = _GetCountCharForTargetChar(lblMaking.Text, _cMessage.MaikingDot)
+        Dim mDotCount As Integer = _GetCountCharForTargetChar(lblMessage.Text, _cMessage.MaikingDot)
 
         '「．」文字列のカウント数が「．」文字列の最高カウント数と同じだったら
         If mDotCount = _cMessage.MakingDotMaxCount Then
 
             'フォームに現在表示されている文字列（「．」を含まない）＋「．」をセット
-            lblMaking.Text = lblMaking.Text.Replace(_cMessage.MaikingDot, "") & _cMessage.MaikingDot
+            lblMessage.Text = lblMessage.Text.Replace(_cMessage.MaikingDot, "") & _cMessage.MaikingDot
 
         Else
 
             'フォームに現在表示されている文字列（「．」を含む）＋「．」をセット
-            lblMaking.Text = lblMaking.Text & _cMessage.MaikingDot
+            lblMessage.Text = lblMessage.Text & _cMessage.MaikingDot
 
         End If
 
@@ -226,7 +250,9 @@ Public Class frmWait
 
 #Region "メソッド"
 
-    ''' <summary>初期画面コントロール設定</summary>
+    ''' <summary>
+    '''   初期画面コントロール設定
+    '''   </summary>
     ''' <remarks></remarks>
     Public Sub _SetInitialControlInScreen() Implements IFormCommonProcess._SetInitialControlInScreen
 
@@ -241,7 +267,7 @@ Public Class frmWait
         Me.MaximizeBox = False
 
         'メッセージ設定
-        Me.lblMaking.Text = _cMessage.Calculating
+        Me.lblMessage.Text = _cMessage.Calculating
         Me.tsslProcessingFolderFile.Text = String.Empty
 
         'ウインドウをAlt+Tabに表示させない
@@ -252,7 +278,9 @@ Public Class frmWait
 
     End Sub
 
-    ''' <summary>コントロールのサイズ変更・再配置</summary>
+    ''' <summary>
+    '''   コントロールのサイズ変更・再配置
+    '''   </summary>
     ''' <param name="pChangedSize">フォームの変更後サイズ</param>
     ''' <remarks>全てのコントロールを取得しコントロールごと処理を行う</remarks>
     Public Sub _ResizeAndRealignmentControls(pChangedSize As Size) Implements IFormCommonProcess._ResizeAndRealignmentControls
@@ -261,7 +289,9 @@ Public Class frmWait
 
     End Sub
 
-    ''' <summary>フォーム表示用タイマー設定</summary>
+    ''' <summary>
+    '''   フォーム表示用タイマー設定
+    '''   </summary>
     ''' <remarks></remarks>
     Private Sub _SetFormDisplayTimer()
 
@@ -279,7 +309,9 @@ Public Class frmWait
 
     End Sub
 
-    ''' <summary>作成中文字列の表示切り替え用タイマー設定</summary>
+    ''' <summary>
+    '''   作成中文字列の表示切り替え用タイマー設定
+    '''   </summary>
     ''' <remarks></remarks>
     Private Sub _SetSwitchingMakingStringTimer()
 
@@ -297,7 +329,9 @@ Public Class frmWait
 
     End Sub
 
-    ''' <summary>対象文字列の中に特定の文字の出現回数を取得</summary>
+    ''' <summary>
+    '''   対象文字列の中に特定の文字の出現回数を取得
+    '''   </summary>
     ''' <param name="pTargetString">対象文字列</param>
     ''' <param name="pCountString">カウント文字列</param>
     ''' <returns>対象文字列内にあるカウント文字列の出現回数</returns>
@@ -313,7 +347,9 @@ Public Class frmWait
 
 #Region "外部公開メソッド"
 
-    ''' <summary>インスタンスを保持する変数の破棄処理</summary>
+    ''' <summary>
+    '''   インスタンスを保持する変数の破棄処理
+    '''   </summary>
     ''' <remarks></remarks>
     Public Shared Sub DisposeInstance()
 

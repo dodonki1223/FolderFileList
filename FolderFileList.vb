@@ -385,6 +385,23 @@ Public Class FolderFileList
 
     End Enum
 
+    ''' <summary>
+    '''   フォルダファイルリスト処理状態
+    ''' </summary>
+    ''' <remarks></remarks>
+    Public Enum FolderFileListProcessState
+
+        ''' <summary>ファイル数をセット</summary>
+        SetFileCount
+
+        ''' <summary>フォルダファイルリストを作成</summary>
+        CreateFolderFileList
+
+        ''' <summary>「最後のファイルかどうか」にセット</summary>
+        SetIsLastFileInFolder
+
+    End Enum
+
 #End Region
 
 #Region "変数"
@@ -424,6 +441,9 @@ Public Class FolderFileList
         ''' <summary>処理対象フォルダファイル</summary>
         Private _ProcessingFolderFile As String
 
+        ''' <summary>フォルダファイルリスト処理状態</summary>
+        Private _FolderFileListProcessState As FolderFileListProcessState
+
         ''' <summary>進捗率プロパティ</summary>
         ''' <remarks></remarks>
         Public Property Percent As Integer
@@ -458,19 +478,40 @@ Public Class FolderFileList
 
         End Property
 
+        ''' <summary>フォルダファイルリスト処理状態</summary>
+        ''' <remarks></remarks>
+        Public Property FolderFileListProcessState As FolderFileListProcessState
+
+            Set(value As FolderFileListProcessState)
+
+                _FolderFileListProcessState = value
+
+            End Set
+            Get
+
+                Return _FolderFileListProcessState
+
+            End Get
+
+        End Property
+
         ''' <summary>
         '''   コンストラクタ
         ''' </summary>
         ''' <param name="pPercent">進捗率</param>
         ''' <param name="pProcessingFolderFile">処理フォルダファイル</param>
+        ''' <param name="pFolderFileListProcessState">フォルダファイルリスト処理状態</param>
         ''' <remarks></remarks>
-        Public Sub New(ByVal pPercent As Integer, ByVal pProcessingFolderFile As String)
+        Public Sub New(ByVal pPercent As Integer, ByVal pProcessingFolderFile As String, ByVal pFolderFileListProcessState As FolderFileListProcessState)
 
-            '進捗率をセット
+            '進捗率をセットをセット
             _Percent = pPercent
 
-            '処理フォルダファイル
+            '処理フォルダファイルをセット
             _ProcessingFolderFile = pProcessingFolderFile
+
+            'フォルダファイルリスト処理状態をセット
+            _FolderFileListProcessState = pFolderFileListProcessState
 
         End Sub
 
@@ -659,8 +700,10 @@ Public Class FolderFileList
                 '処理進捗報告を行う時
                 If _IsReportProcessProgress Then
 
-                    'フォルダ・ファイルリストのファイル数をセット
-                    '※ファイル数が多い場合は時間がかかるので注意
+                    'フォルダファイルリストのファイル数のセットの進捗報告
+                    _ReportSetFileCount()
+
+                    'フォルダファイルリストのファイル数をセット ※ファイル数が多い場合は時間がかかるので注意
                     _FolderFileListCount = Me.TargetPathFilesList.Count
 
                 End If
@@ -1132,7 +1175,6 @@ Public Class FolderFileList
 
         Try
 
-            'ToDo:「PathTooLongException」が発生するため、何か対処を考えること
             Dim mFolderFile As New System.IO.FileInfo(pTargetPath)
 
             '------------------------------
@@ -1226,13 +1268,16 @@ Public Class FolderFileList
             '行データをDataTableにセット
             pFolderFileList.Rows.Add(mAddDataRow)
 
-            'フォルダファイルリスト作業進捗報告
-            '※処理進捗報告を行うときのみ実行
-            If _IsReportProcessProgress Then _ReportProcessProgress(mFolderFile.Name)
+            'フォルダファイルリスト作業進捗報告 ※処理進捗報告を行うときのみ実行
+            If _IsReportProcessProgress Then _ReportCreateFolderFileList(mFolderFile.Name)
 
-        Catch ex As Exception
+        Catch ex As PathTooLongException
 
+            Throw ex
 
+        Catch ex As DirectoryNotFoundException
+
+            Throw ex
 
         End Try
 
@@ -1252,18 +1297,20 @@ Public Class FolderFileList
         'フォルダファイルリストデータで無い時は処理を終了
         If IsFolderFileListData(pFolderFileList) = False Then Exit Sub
 
-        '「No」が0のもの（選択されたフォルダ）を除き、「親フォルダのフルパス」でグループ化しその中で最大の「No」を取得するクエリーを作成
-        Dim mQuery = pFolderFileList.AsEnumerable() _
-                     .Where(Function(ExclusionRow As DataRow) ExclusionRow(FolderFileListColumn.No) <> 0) _
-                     .GroupBy(Function(FolderFileListRow As DataRow) FolderFileListRow(FolderFileListColumn.ParentFolderFullPath)) _
-                     .Select(Function(ParentFolderGroupBy) New With { _
-                                                                         Key .No = ParentFolderGroupBy.Max(Function(ParentFolder) ParentFolder(FolderFileListColumn.No)), _
-                                                                         Key .PanretFolder = ParentFolderGroupBy.Key
-                                                                     })
-
         '「最後のファイルかどうか」にFalseを一括でセット
         pFolderFileList.AsEnumerable _
                        .Select(Function(UpdateRow As DataRow) InlineAssignHelper(UpdateRow(FolderFileListColumn.IsLastFileInFolder), False)).ToList()
+
+        Dim mQuery = pFolderFileList.AsEnumerable() _
+                     .Where(Function(ExclusionRow As DataRow) ExclusionRow(FolderFileListColumn.No) <> 0) _
+                     .GroupBy(Function(FolderFileListRow As DataRow) FolderFileListRow(FolderFileListColumn.ParentFolderFullPath)) _
+                     .Select(Function(ParentFolderGroupBy) New With {
+                                                                         Key .No = ParentFolderGroupBy.Max(Function(ParentFolder) ParentFolder(FolderFileListColumn.No)),
+                                                                         Key .PanretFolder = ParentFolderGroupBy.Key
+                                                                     })
+
+        '「最後のファイルかどうか」にTrueをセットし終わった数を保持する変数
+        Dim mProcessCount As Integer = 1
 
         'フォルダ内で最後のファイルであるデータ分繰り返す
         For Each mDr In mQuery
@@ -1272,6 +1319,12 @@ Public Class FolderFileList
             pFolderFileList.AsEnumerable() _
                            .Where(Function(WhereRow As DataRow) WhereRow(FolderFileListColumn.No) = mDr.No) _
                            .Select(Function(UpdateRow As DataRow) InlineAssignHelper(Of Boolean)(UpdateRow(FolderFileListColumn.IsLastFileInFolder), True)).ToList()
+
+            '「最後のファイルかどうか」にTrueをセットする処理の作業進捗報告 ※処理進捗報告を行うときのみ実行
+            If _IsReportProcessProgress Then _ReportSetIsLastFileInFolder(mQuery.Count, mProcessCount, mDr.PanretFolder)
+
+            '「最後のファイルかどうか」にTrueをセットし終わった数を更新
+            mProcessCount = mProcessCount + 1
 
         Next
 
@@ -1691,11 +1744,27 @@ Public Class FolderFileList
 #Region "フォルダファイルリスト進捗率報告"
 
     ''' <summary>
-    '''   フォルダファイルリスト進捗報告
+    '''   フォルダファイルリストのファイル数のセットの進捗報告
+    ''' </summary>
+    ''' <remarks></remarks>
+    Private Sub _ReportSetFileCount()
+
+        'フォルダファイルリストの進捗状況を報告する変数がNothingで無かった時
+        If Not _ProcessProgresss Is Nothing Then
+
+            '進捗率を報告
+            _ProcessProgresss.Report(New FolderFileListProgress(0, "", FolderFileListProcessState.SetFileCount))
+
+        End If
+
+    End Sub
+
+    ''' <summary>
+    '''   フォルダファイルリスト作成の進捗報告
     ''' </summary>
     ''' <param name="pPath">処理フォルダファイル</param>
     ''' <remarks></remarks>
-    Private Sub _ReportProcessProgress(ByVal pPath As String)
+    Private Sub _ReportCreateFolderFileList(ByVal pPath As String)
 
         'フォルダファイルリストの進捗状況を報告する変数がNothingで無かった時
         If Not _ProcessProgresss Is Nothing Then
@@ -1704,7 +1773,29 @@ Public Class FolderFileList
             Dim mProcessPercent As Integer = (_FolderFileList.Rows.Count / _FolderFileListCount) * 100
 
             '進捗率を報告
-            _ProcessProgresss.Report(New FolderFileListProgress(mProcessPercent, pPath))
+            _ProcessProgresss.Report(New FolderFileListProgress(mProcessPercent, pPath, FolderFileListProcessState.CreateFolderFileList))
+
+        End If
+
+    End Sub
+
+    ''' <summary>
+    '''   「最後のファイルかどうか」にTrueをセットする処理の作業進捗
+    ''' </summary>
+    ''' <param name="pTargetFileCount">処理対象数</param>
+    ''' <param name="pProcessCount">処理済み数</param>
+    ''' <param name="pFolderPath">対象フォルダパス</param>
+    ''' <remarks></remarks>
+    Private Sub _ReportSetIsLastFileInFolder(ByVal pTargetFileCount As Integer, ByVal pProcessCount As Integer, ByVal pFolderPath As String)
+
+        'フォルダファイルリストの進捗状況を報告する変数がNothingで無かった時
+        If Not _ProcessProgresss Is Nothing Then
+
+            '現在の処理進捗率を計算
+            Dim mProcessPercent As Integer = (pProcessCount / pTargetFileCount) * 100
+
+            '進捗率を報告
+            _ProcessProgresss.Report(New FolderFileListProgress(mProcessPercent, pFolderPath, FolderFileListProcessState.SetIsLastFileInFolder))
 
         End If
 

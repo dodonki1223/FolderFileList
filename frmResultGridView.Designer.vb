@@ -22,6 +22,7 @@ Partial Class frmResultGridView
     'コード エディターを使って変更しないでください。
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmResultGridView))
         Me.lblRangeStart = New System.Windows.Forms.Label()
         Me.txtRangeStart = New System.Windows.Forms.TextBox()
         Me.txtMaxSearchCount = New System.Windows.Forms.TextBox()
@@ -332,10 +333,11 @@ Partial Class frmResultGridView
         Me.Controls.Add(Me.grpExtension)
         Me.Controls.Add(Me.grpDisplayTarget)
         Me.Controls.Add(Me.dgvFolderFileList)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.KeyPreview = True
         Me.MinimumSize = New System.Drawing.Size(300, 39)
         Me.Name = "frmResultGridView"
-        Me.Opacity = 0.0R
+        Me.Opacity = 0R
         Me.Text = "リスト表示フォーム"
         Me.grpFileSize.ResumeLayout(False)
         Me.grpFileSize.PerformLayout()
@@ -349,7 +351,7 @@ Partial Class frmResultGridView
         Me.PerformLayout()
 
     End Sub
-	Friend WithEvents dgvFolderFileList As System.Windows.Forms.DataGridView
+    Friend WithEvents dgvFolderFileList As System.Windows.Forms.DataGridView
 	Friend WithEvents grpDisplayTarget As System.Windows.Forms.GroupBox
 	Friend WithEvents rbtnFile As System.Windows.Forms.RadioButton
 	Friend WithEvents rbtnFolder As System.Windows.Forms.RadioButton

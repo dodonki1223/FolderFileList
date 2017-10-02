@@ -200,6 +200,9 @@ Public Class frmResultText
 
         End Select
 
+        '出力用文字列表示テキストボックスへフォーカスをセット
+        Call _FocusTxtFolderFileList()
+
     End Sub
 
     ''' <summary>
@@ -514,13 +517,10 @@ Public Class frmResultText
     ''' </remarks>
     Private Sub _SetControlInScreen()
 
-        '--------------------------
-        ' コントロールの使用設定
-        '--------------------------
         'チェック済みのラジオボタンを取得
         Dim mRbtnButton As RadioButton = _GetCheckedRadioButton(grpDisplayTarget)
 
-        'ラジオボタンの状態により拡張子コンボボックスの設定を行う
+        'ラジオボタンの状態により拡張子コンボボックスとファイル名検索テキストボックスの設定を行う
         Select Case mRbtnButton.Name
 
             Case rbtnAll.Name
@@ -532,7 +532,7 @@ Public Class frmResultText
                 '検索ボタンの使用を可に
                 btnNameSearch.Enabled = True
 
-                '名前検索文字列入力テキストボックスの入力を不可に
+                '名前検索文字列入力テキストボックスの入力を可能に
                 txtName.ReadOnly = False
                 txtName.BackColor = Color.White
 
@@ -548,23 +548,16 @@ Public Class frmResultText
 
                 '名前検索文字列入力テキストボックスの入力を不可に
                 txtName.ReadOnly = True
+                txtName.Text = ""
                 txtName.BackColor = Color.Gray
 
         End Select
 
-        '--------------------------
-        ' 出力用文字列をセット
-        '--------------------------
+        '出力用文字列をセット
         txtFolderFileList.Text = Me.OutputText
 
-        '--------------------------
-        ' フォーカスのセット
-        '--------------------------
-        'フォーカスを出力用文字列表示テキストボックスへ
-        txtFolderFileList.Focus()
-
-        '選択位置をなしに設定 ※全選択状態の回避のため
-        txtFolderFileList.Select(0, 0)
+        '出力用文字列表示テキストボックスへフォーカスをセット
+        Call _FocusTxtFolderFileList()
 
     End Sub
 
@@ -613,6 +606,20 @@ Public Class frmResultText
             End Select
 
         Next
+
+    End Sub
+
+    ''' <summary>
+    '''   出力用文字列表示テキストボックスへのフォーカス処理
+    ''' </summary>
+    ''' <remarks></remarks>
+    Private Sub _FocusTxtFolderFileList()
+
+        'フォーカスを出力用文字列表示テキストボックスへ
+        txtFolderFileList.Focus()
+
+        '選択位置をなしに設定 ※全選択状態の回避のため
+        txtFolderFileList.Select(0, 0)
 
     End Sub
 

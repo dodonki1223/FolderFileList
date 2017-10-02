@@ -8,7 +8,9 @@ Imports System.Runtime.Serialization.Formatters.Binary
 Imports System.Windows.Forms
 Imports Microsoft.Win32
 
-''' <summary>設定を読み書きする機能を提供します</summary>
+''' <summary>
+'''   設定を読み書きする機能を提供します
+''' </summary>
 ''' <remarks></remarks>
 <Serializable()> _
 Public Class Settings
@@ -36,8 +38,12 @@ Public Class Settings
 
 #Region "プロパティ"
 
-    ''' <summary>ターゲットフォームプロパティ</summary>
-    ''' <remarks>※シリアライズを行うプロパティ</remarks>
+    ''' <summary>
+    '''   ターゲットフォームプロパティ
+    ''' </summary>
+    ''' <remarks>
+    '''   ※シリアライズを行うプロパティ
+    ''' </remarks>
     Public Property TargetForm() As CommandLine.FormType
 
         Get
@@ -54,9 +60,13 @@ Public Class Settings
 
     End Property
 
-    ''' <summary>実行タイププロパティ</summary>
-    ''' <remarks>保存したファイルを即時で実行するかどうか
-    '''          ※シリアライズを行うプロパティ                          </remarks>
+    ''' <summary>
+    '''   実行タイププロパティ
+    ''' </summary>
+    ''' <remarks>
+    '''   保存したファイルを即時で実行するかどうか
+    '''   ※シリアライズを行うプロパティ
+    ''' </remarks>
     Public Property Execute() As CommandLine.ExecuteType
 
         Get
@@ -73,9 +83,13 @@ Public Class Settings
 
     End Property
 
-    ''' <summary>1ページ内に表示できるファイル数プロパティ</summary>
-    ''' <remarks>リスト表示フォームの１ページ内に表示できる最大ファイル数
-    '''          ※シリアライズを行うプロパティ                          </remarks>
+    ''' <summary>
+    '''   1ページ内に表示できるファイル数プロパティ
+    ''' </summary>
+    ''' <remarks>
+    '''   リスト表示フォームの１ページ内に表示できる最大ファイル数
+    '''   ※シリアライズを行うプロパティ
+    ''' </remarks>
     Public Property MaxCountInPage() As Integer
 
         Get
@@ -92,9 +106,13 @@ Public Class Settings
 
     End Property
 
-    ''' <summary>設定を読み書きするクラスを返却します</summary>
-    ''' <remarks>※デザインパターンのSingletonパターンです
-    '''            シリアライズを行わないプロパティ       </remarks>
+    ''' <summary>
+    '''   設定を読み書きするクラスを返却します
+    ''' </summary>
+    ''' <remarks>
+    '''   ※デザインパターンのSingletonパターンです
+    '''     シリアライズを行わないプロパティ
+    ''' </remarks>
     <System.Xml.Serialization.XmlIgnore()> _
     Public Shared Property Instance() As Settings
 
@@ -119,8 +137,12 @@ Public Class Settings
 
 #Region "コンストラクタ"
 
-    ''' <summary>コンストラクタ</summary>
-    ''' <remarks>外部に公開しない</remarks>
+    ''' <summary>
+    '''   コンストラクタ
+    ''' </summary>
+    ''' <remarks>
+    '''   引数無しは外部に公開しない
+    ''' </remarks>
     Private Sub New()
 
         'ターゲットフォームのデフォルトはフォルダファイルリストの出力文字列を表示するフォーム
@@ -132,7 +154,9 @@ Public Class Settings
 
 #Region "メソッド"
 
-    ''' <summary>設定をXMLファイルから読み込み復元する</summary>
+    ''' <summary>
+    '''   設定をXMLファイルから読み込み復元する
+    ''' </summary>
     ''' <remarks></remarks>
     Public Shared Sub LoadFromXmlFile()
 
@@ -155,7 +179,9 @@ Public Class Settings
 
     End Sub
 
-    ''' <summary>現在の設定をXMLファイルに書き込む</summary>
+    ''' <summary>
+    '''   現在の設定をXMLファイルに書き込む
+    ''' </summary>
     ''' <remarks></remarks>
     Public Shared Sub SaveToXmlFile()
 
@@ -173,9 +199,13 @@ Public Class Settings
 
     End Sub
 
-    ''' <summary>設定ファイルの保存場所を取得</summary>
+    ''' <summary>
+    '''   設定ファイルの保存場所を取得
+    ''' </summary>
     ''' <returns>設定ファイルの保存場所パス</returns>
-    ''' <remarks>「EXE実行パスの親フォルダ + \ + Config.xml」形式のパスを返す</remarks>
+    ''' <remarks>
+    '''   「EXE実行パスの親フォルダ + \ + Config.xml」形式のパスを返す
+    ''' </remarks>
     Private Shared Function GetSettingPath() As String
 
         'EXEの実行パスを取得
