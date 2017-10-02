@@ -96,10 +96,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AggregateException.vb" />
-    <Compile Include="ByteUnit.vb" />
     <Compile Include="CommandLine.vb" />
     <Compile Include="DebugMode.vb" />
     <Compile Include="DebugWatch.vb" />
+    <Compile Include="FolderFileList.vb" />
     <Compile Include="frmPopupMessage.Designer.vb">
       <DependentUpon>frmPopupMessage.vb</DependentUpon>
     </Compile>
@@ -112,7 +112,6 @@
     <Compile Include="frmCommon.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FolderFileList.vb" />
     <Compile Include="frmMain.vb">
       <SubType>Form</SubType>
     </Compile>

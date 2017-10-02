@@ -22,18 +22,18 @@ Partial Class frmCommon
     'コード エディターを使って変更しないでください。
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-		Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmCommon))
-		Me.SuspendLayout()
-		'
-		'frmCommon
-		'
-		Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
-		Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-		Me.ClientSize = New System.Drawing.Size(284, 0)
-		Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
-		Me.Name = "frmCommon"
-		Me.Text = "CommonForm"
-		Me.ResumeLayout(False)
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmCommon))
+        Me.SuspendLayout()
+        '
+        'frmCommon
+        '
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.ClientSize = New System.Drawing.Size(284, 0)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.Name = "frmCommon"
+        Me.Text = "CommonForm"
+        Me.ResumeLayout(False)
 
-	End Sub
+    End Sub
 End Class
