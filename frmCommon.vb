@@ -33,7 +33,7 @@ Public Class frmCommon
     '''              307：累積バージョン。ビルドバージョン。Chromeが出てから307番目に作られたもの
     '''               11：累積バージョンのマイナー番号（子番号）。リビジョン（修正版）
     ''' </remarks>
-    Public Const cVersionNumber As String = "Ver2.0.0.0"
+    Public Const cVersionNumber As String = "Ver2.0.0.1"
 
 #End Region
 

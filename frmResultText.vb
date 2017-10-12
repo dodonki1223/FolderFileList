@@ -240,6 +240,10 @@ Public Class frmResultText
         'フォーカスのあるコントロールを取得
         Dim mForcusedControl As Control = Me.ActiveControl
 
+        '名前（LIKE検索）コントロールにフォーカスがある時は処理を終了
+        '※Shiftキーを押して文字入力するとショートカットキーとして認識されてしまうための対応
+        If mForcusedControl.Name = txtName.Name Then Exit Sub
+
         If e.Control Then
 
             '-------------------------------
@@ -465,6 +469,55 @@ Public Class frmResultText
 
         'リスト表示フォームをモードレスで表示
         frmResultGridView.Instance.Show()
+
+    End Sub
+
+#End Region
+
+#Region "テキストボックス"
+
+    ''' <summary>
+    '''   名前テキストボックスGotFocusイベント
+    ''' </summary>
+    ''' <param name="sender">名前テキストボックス</param>
+    ''' <param name="e">GotFocusイベント</param>
+    ''' <remarks></remarks>
+    Private Sub txtName_GotFocus(sender As Object, e As EventArgs) Handles txtName.GotFocus
+
+        'テキストボックスの内容を全選択状態に
+        txtName.SelectAll()
+
+    End Sub
+
+    ''' <summary>
+    '''   名前テキストボックスKeyPressイベント
+    ''' </summary>
+    ''' <param name="sender">名前テキストボックス</param>
+    ''' <param name="e">KeyPressイベント</param>
+    ''' <remarks></remarks>
+    Private Sub txtName_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txtName.KeyPress
+
+        '押されたキーがEnterまたはEscapeの時
+        If e.KeyChar = Microsoft.VisualBasic.ChrW(Keys.Enter) _
+        OrElse e.KeyChar = Microsoft.VisualBasic.ChrW(Keys.Escape) Then
+
+            'キーの入力イベントを処理済みにする（ビープ音を鳴らさない）
+            e.Handled = True
+
+        End If
+
+    End Sub
+
+    ''' <summary>
+    '''   名前テキストボックスMouseDownイベント
+    ''' </summary>
+    ''' <param name="sender">名前テキストボックス</param>
+    ''' <param name="e">MouseDownイベント</param>
+    ''' <remarks></remarks>
+    Private Sub txtName_MouseDown(sender As Object, e As MouseEventArgs) Handles txtName.MouseDown
+
+        'テキストボックスの内容を全選択状態に
+        txtName.SelectAll()
 
     End Sub
 
